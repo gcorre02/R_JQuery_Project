@@ -26,3 +26,4 @@ getQuandlPlot = function(target){
   contents$lowpoint <- min(contents$Close);
   ggplot(data = contents, ymin=lowpoint, aes(Date, ymin=lowpoint, ymax=Close)) + geom_ribbon(color="black", fill="lightblue", alpha=0.5) + ylim(range(contents$Close));  
 }
+
