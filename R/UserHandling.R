@@ -1,11 +1,12 @@
-
-load("data/logins.Rda")
+load("data/logins.Rda", envir = as.environment(".GlobalEnv"))
 
 persistData = function(logins, filename){
   target = paste0("data/", filename,".Rda")
  # logins = data
- assign("logins", logins, envir = .GlobalEnv) 
- #save(logins, file = target)
+  unlockBinding("logins", as.environment(".GlobalEnv"))
+  assign("logins", logins, envir = as.environment(".GlobalEnv")) 
+  lockBinding("logins", as.environment(".GlobalEnv"))
+  save(logins, file = target)
   #saveRDS(data,target)
 }
 
@@ -14,7 +15,7 @@ addUser = function(username, password){
   if(is.na(loginsFile[username,])){
   loginsFile = rbind(loginsFile, as.data.frame(password,row.names=username, col.names= "password"))
   persistData(loginsFile,"logins")
-    return(ls())
+    return("successful")
   }
   #add trycatch with return of success or notelse error !
   return("unsuccessful")
