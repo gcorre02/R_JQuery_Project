@@ -117,9 +117,9 @@ function addInputMethod() {
             $("#login").text("Please Register");
             //call function to generate user registration
             addInputMethod();
-          }
+          }*/
         }).fail(function(){
-          alert("R failed " + validateLogin.responseText)*/
+          alert("R failed " + validateLogin.responseText)
         });
         
         $("#loginbutton").removeAttr("disabled");

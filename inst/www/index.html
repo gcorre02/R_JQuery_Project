@@ -7,6 +7,7 @@
     <script src="opencpu/jquery-1.10.2.min.js"></script>
     <script src="opencpu/opencpu-0.4.js"></script>
     <script src="helloWorld.js"></script>
+    <script src="stocksSelect.js"></script>
   </head>
   <body>
     First name: <input type="text" id ="fname"><br>
@@ -25,6 +26,16 @@
     <div id = plotable></div>
     <div id = registerform></div>
     
+    <div id = "select securities">
+    <form id="securityList"></form>
+    
+    <button onclick="generateStocksList()">Search By Ticker</button>  
+    <button onclick="generateStocksNamesList()">Search By Name</button>
+    </div>
+    
+    <div id = "tabletest">
+      
+    </div>
 
   </body>
 </html>
