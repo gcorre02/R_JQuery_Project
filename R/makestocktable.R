@@ -23,3 +23,25 @@ getTickers = function(){
 getCompanies = function(){
   makestocktable()$Company
 }
+
+getOtherValue = function(valueType, namtckr){
+  if(valueType == "getTickers"){
+    return( getCompanyByTicker(namtckr))
+  } else {
+    return(getTickerByCompany(namtckr))
+  }
+}
+
+#current$Company[which(current$Ticker == "AA")]
+
+getCompanyByTicker = function(namtckr){
+  current = makestocktable()
+  result = current$Company[which(current$Ticker == namtckr)]
+  result
+}
+
+getTickerByCompany = function(namtckr){
+  current = makestocktable()
+  result = current$Ticker[which(current$Company == namtckr)]
+  result
+}

@@ -1,5 +1,6 @@
 //edit this function to work both for tickers and stock names
 //attention: forms reload!!!, that might be interesting ?
+include(tableGenerator.js);
 function generateStocksList(listType, formId,target) {//got this: from somewhere! w3 school thingy ? 
       var x = document.createElement("INPUT");
       x.setAttribute("list", target);
@@ -11,8 +12,9 @@ function generateStocksList(listType, formId,target) {//got this: from somewhere
       document.getElementById(formId).appendChild(y);
       
       var numBox = document.createElement("INPUT");
+      numBox.setAttribute("type", "text");
       numBox.setAttribute("id", "numbox");
-      document.getElementById(formId).appendChild(numbox);
+      document.getElementById(formId).appendChild(numBox);
 
       
       var button = document.createElement("BUTTON");
@@ -28,44 +30,30 @@ function generateStocksList(listType, formId,target) {//got this: from somewhere
       },function(output){
         //something = ("ewrdad,aerwefsef,aer,ar,ad");
         //alert( typeof String(output).split(','));
-
-        allTickers = String(output).split(',');
+        
+        allTickers = eval(output);//this function coerces to array the contents of the JSON provided by R (server)
+    //    alert(allTickers);
         for(tcker in allTickers){
           appendOptions(allTickers[tcker], target);      
         }
       });
       
       $("#"+"submit"+target).on("click", function(){
+        
         //disable the button to prevent multiple clicks
         $("#"+"submit"+target).attr("disabled", "disabled");
         var choice = $("#"+"input_" + target).val();
         var percentage = $("#numbox").val();
-       // var regpass = $("#regPass").val();
-        alert("Submit button pressed, choice: " + choice + " for a weight of: "+ percentage + "%");
-        
-        //have form
-        //update/populate form
-        //submit form to R!!
-        
-        /*
-        var validateRegister = ocpu.rpc("addUser", {
-          username : reguser,
-          password : regpass
+      
+        ocpu.rpc("getOtherValue",{
+          valueType : listType,
+          namtckr : choice
         }, function(output){
-          //should link somewhere
-          alert("Your registration was " + output) ;/*
-          if(output == "true"){//note : only == works here...
-            $("#login").text("Login Successful");
-          } else if (output == "false"){
-            $("#login").text("Login unsuccessful");
-          } else {
-            $("#login").text("Please Register");
-            //call function to generate user registration
-            addInputMethod();
-          }
-        }).fail(function(){
-          alert("R failed " + validateLogin.responseText)
-        });*/
+           //alert("got this from R: " + output);
+           handleTables(choice, percentage, output);
+        });
+       
+       
         
         $("#"+"submit"+target).removeAttr("disabled");
         //create a function for this:
@@ -83,5 +71,24 @@ function appendOptions(content, idOfElement){
       document.getElementById(idOfElement).appendChild(z);
 }
 
+function handleTables(choice, percentage, correspondingValue){
+  if(checkUpperCase(String(correspondingValue))){
+    ticker = correspondingValue;
+    company = choice;
+  } else {
+    ticker = choice;
+    company = correspondingValue;
+  }
+  //test for generated table existence, if false, gentable() else addToTable()!
+        if (document.getElementById('tabler') == null) {
+          generateTable(ticker,percentage, company);
+        } else{
+          pos = document.getElementsByTagName("tr").length-1;
+          addToTable(ticker, percentage,pos, company)  
+        }
+       // var regpass = $("#regPass").val();
+      //alert("Submit button pressed, choice: " + choice + " for a weight of: "+ percentage + "%");
+        
+}
 
 //"generateStocksNamesList()"

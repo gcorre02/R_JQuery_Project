@@ -1,11 +1,11 @@
 $(document).ready(function(){
-  alert("the thing was");
-  alert("changed!");
+  //alert("the thing was");
+  alert("this version");
   
         $("#submitbutton").on("click", function(){
         //disable the button to prevent multiple clicks
         $("#submitbutton").attr("disabled", "disabled");
-        alert("inside the button");
+        //alert("inside the button");
         //read the value for 'myname'
         //var myname = $("#namefield").val();
         var myname = $("#fname").val() + " " + $("#lname").val();
@@ -21,7 +21,7 @@ $(document).ready(function(){
         var reques = ocpu.rpc("searchQuandle", {
           query : "SP500"
         }, function(output){
-          alert("Should be working quandle it is");
+          //alert("Should be working quandle it is");
           $("#SP500").text(output);
           
         });
@@ -60,7 +60,7 @@ $(document).ready(function(){
         $("#loginbutton").attr("disabled", "disabled");
         var user = $("#user").val();
         var pass = $("#pass").val();
-        alert("loginbutton pressed " + user + " " + pass);
+        //alert("loginbutton pressed " + user + " " + pass);
 
         var validateLogin = ocpu.rpc("checkLogin", {
           user : user,
@@ -101,7 +101,7 @@ function addInputMethod() {
         $("#registerbutton").attr("disabled", "disabled");
         var reguser = $("#regUser").val();
         var regpass = $("#regPass").val();
-        alert("registerbutton pressed " + reguser + " " + regpass);
+        //alert("registerbutton pressed " + reguser + " " + regpass);
         
         var validateRegister = ocpu.rpc("addUser", {
           username : reguser,
