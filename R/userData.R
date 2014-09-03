@@ -33,11 +33,13 @@ createPortfolio = function(portfolioDataFrame, portfolioName, typeOfPortfolio){
 }
 
 #-> collect data from website and generate portfolio dataframe
-receivePortfolio = function(id, ticker, opp, percentage){
-
-  assets = data.frame(cbind(id, ticker, opp, percentage))
-#  save(assets, file = "/Users/gctribeiro/test3/data/assetsTest.Rda")
-  return(assets)
+receivePortfolio = function(id, ticker, company, percentage){
+  assets = data.frame(cbind(id, ticker, company, percentage))
+  save(assets, file = "/Users/gctribeiro/test3/data/assetsTest.Rda") #belongs to addPortfolio.... methinks
+  #createPortfolio()
+  #addPorfolio
+  #createUserData must be asscoiated with the creation of a new user, and then the html must maintain the user login info to pass as argument in here!
+  return("sucessful")
 
 }
 
@@ -45,5 +47,6 @@ receivePortfolio = function(id, ticker, opp, percentage){
 #-> add visualizations of all available portfolio
 #-> handle persistence, like in test3?
 
-
+#-> calculate portfolio's details :
+#-> collectionWeights = as.numeric(levels(assets$percentage))/100
 

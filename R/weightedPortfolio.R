@@ -10,6 +10,7 @@ ticker = sample(sp500Tickers, sampleSize)
 acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2010-01-01")  
 
 collectionWeights = rep(1/sampleSize,sampleSize);
+
 #collectionWeights = getSampleDistributionOfWeights(30)
 #collectionWeights = c(0.4,0.6)
 
