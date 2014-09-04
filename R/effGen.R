@@ -5,7 +5,7 @@ library(stats)
 library(tseries)
 library(stockPortfolio)
 
-ticker = c("CMG","LNKD","AMZN","GOOGL","WFC","SBUX")
+#ticker = c("CMG","LNKD","AMZN","GOOGL","WFC","SBUX")
 
 #this has to be called right before the server is (plus lines 93 and 94 )
 sp500Tickers = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
@@ -90,11 +90,14 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
 
 
 ##function
-collectData = function(zoom, sourceData, sampleSize, targetReturn){
-  
-  sampleSize = 18
-#  ticker = sample(sp500Tickers, sampleSize)
-  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2010-01-01")  
+collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-31"){
+  #zoom = 100
+  sourceData = 1
+  sampleSize = 8
+  targetReturn = 2
+#  sampleSize = 18
+  #ticker = sample(sp500Tickers, sampleSize)
+  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = end, start = start)  
   
   allStockHistory = NULL
   for(i in 1:length(acquiredStocks$ticker)){
@@ -109,8 +112,10 @@ collectData = function(zoom, sourceData, sampleSize, targetReturn){
   }
   
   #important variables
-  averageReturn = colMeans(acquiredStocks$R)*100
-  stocksVariance = var(allStockHistory)#this should probably be cov not var
+  averageReturn = colMeans(acquiredStocks$R)*100#((1 + colMeans(acquiredStocks$R))^(365)-1)*100 -> missing probability here!
+  stocksVariance = cov(allStockHistory)#this should probably be cov not var
+
+
   
   ##application
   ######################################################
@@ -135,6 +140,7 @@ collectData = function(zoom, sourceData, sampleSize, targetReturn){
   #C = zbar'*S^-1*zbar
   #D = A*C-B^2
   
+  #provision the use of GINV() for the out of size matrixes
   A = sum(solve(S)) #solve(S) does the propper algebraic based inverse operation of the matrix
   B = colSums(solve(S))%*%zbar
   C = t(zbar) %*% solve(S) %*%zbar
@@ -208,7 +214,7 @@ collectData = function(zoom, sourceData, sampleSize, targetReturn){
   ##generate collection of efficient portfolios according to a step and interval of returns
   #add the inputs to this function to the reactive
   #must match the sliderInput() values, remove the magic numbers
-  pc = stepThroughEffPortfolios(0,20,1, A, B, C, D, w_g, w_d, zbar, S)
+  pc = stepThroughEffPortfolios(0,4,0.25, A, B, C, D, w_g, w_d, zbar, S)
   
   
   #populate a global variable with all the points on the efficient frontier for which a weight distribution was calculated.

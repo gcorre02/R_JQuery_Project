@@ -3,6 +3,7 @@
 # > all user's portfolios
 # > accessed to add more user portfolios
 
+library(ggplot2)
 
 createUserData = function(username, password){
   userData = vector("list",0)
@@ -50,3 +51,13 @@ receivePortfolio = function(id, ticker, company, percentage){
 #-> calculate portfolio's details :
 #-> collectionWeights = as.numeric(levels(assets$percentage))/100
 
+
+getEff = function(){
+  ticker = as.character(assets$ticker)
+
+  prtf = collectData(ticker)
+  contentsX = prtf$minstd
+  contentsY = prtf$mu
+  #ggplot(data = contents, ymin=lowpoint, aes(Date, ymin=lowpoint, ymax=Close)) + geom_ribbon(color="black", fill="lightblue", alpha=0.5) + ylim(range(contents$Close));  
+  result = qplot(prtf$minstd, prtf$mu, type = "l")
+}

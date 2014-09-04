@@ -4,10 +4,10 @@ library(tseries)
 library(stockPortfolio)
 source("R/generateWeightDist.R")
 
-sampleSize = 2
+sampleSize = 8
 sp500Tickers = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
-ticker = sample(sp500Tickers, sampleSize)
-acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2010-01-01")  
+ticker = sp500Tickers#sample(sp500Tickers, sampleSize)
+acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-01-01")  
 
 collectionWeights = rep(1/sampleSize,sampleSize);
 
@@ -27,7 +27,7 @@ for(i in 1:length(acquiredStocks$ticker)){
 }
 
 #important variables
-averageReturn = colMeans(acquiredStocks$R)*100  #using average return for the expected ?
+averageReturn = colMeans(acquiredStocks$R)  #using average return for the expected ?
 stocksVariance = var(acquiredStocks$R)#was using allStockHistory instead
 
 #todo now: 
@@ -47,7 +47,7 @@ weightsMatrix = collectionWeights %*% t(collectionWeights)
 portfolioVar = sum(StocksCov*weightsMatrix )#* collectionProbs)
 
 #results
-eRp = wmeanReturn
+eRp = ((1 + wmeanReturn)^(365)-1)*100 # average annual rate of return
 VarRp = sqrt(portfolioVar)
 eRp
 VarRp

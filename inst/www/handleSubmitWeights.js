@@ -53,8 +53,16 @@ function doAbunchOfStuffWithR(){
           company : opposite,
           percentage : percentage
         }, function(output){
-          alert("R comms? " + output);
+          alert("R persistence of Portfolio: " + output);
         });
+        
+  //publish eff frontier plot to div<effPlot>
+        var recquestEffofPortfolio = $("#portfolio").rplot("getEff", {
+        }).fail(function(){
+          alert("Failed to plot stock: " + req.responseText)
+        });
+  
+        
   //disable searchby buttons until submit
   // ask user for a name for the portfolio...
   //send portfolio ticker and weight to R and persist it under the user
