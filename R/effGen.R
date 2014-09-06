@@ -85,12 +85,16 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
     }
     
   }
+  pointsDF = data.frame()
+  for(item in portfolioCollection){pointsDF = rbind(pointsDF,cbind(item$risk,item$expectedReturn))}
+  names(pointsDF) = c("minstd","mu")
+  portfolioCollection$pointsDF = pointsDF
   portfolioCollection
 }
 
 
 ##function
-collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-31"){
+collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-31", targetScale){
   #zoom = 100
   sourceData = 1
   sampleSize = 8
@@ -112,7 +116,7 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   }
   
   #important variables
-  averageReturn = colMeans(acquiredStocks$R)*100#((1 + colMeans(acquiredStocks$R))^(365)-1)*100 -> missing probability here!
+  averageReturn = colMeans(acquiredStocks$R)*100#((1 + colMeans(acquiredStocks$R))^(365)-1)*100 ##-> missing probability here!
   stocksVariance = cov(allStockHistory)#this should probably be cov not var
 
 
@@ -153,15 +157,16 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   #% Efficient Frontier
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  mu = 1:200;
-  mu = mu/zoom;
+  min = floor(targetScale) - 0.5#MAGIC NUMBER
+  max = floor(targetScale) + 3.5#MAGIC NUMBER
+  mu = seq(from = (min-0.25), to = (max+0.25), by = (max-min)/zoom)
+#  mu = mu/zoom;
   
   minvar = ((A*mu^2)-2*B*mu+C)/D;
   minstd = sqrt(minvar);
   
   #remove
-  plot(minstd, mu, main = 'Efficient Frontier with Individual Securities', ylab = ('Expected Return (%)'), xlab = ('Standard Deviation'), type = "l")
+  effrontier = plot(minstd, mu, main = 'Efficient Frontier with Individual Securities', ylab = ('Expected Return (%)'), xlab = ('Standard Deviation'), type = "l")
   # this adds the individual points of each security
   points(stdevs,zbar, type = "p")
   
@@ -214,7 +219,8 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   ##generate collection of efficient portfolios according to a step and interval of returns
   #add the inputs to this function to the reactive
   #must match the sliderInput() values, remove the magic numbers
-  pc = stepThroughEffPortfolios(0,4,0.25, A, B, C, D, w_g, w_d, zbar, S)
+  
+  pc = stepThroughEffPortfolios(min,max,0.25, A, B, C, D, w_g, w_d, zbar, S)
   
   
   #populate a global variable with all the points on the efficient frontier for which a weight distribution was calculated.
@@ -248,9 +254,50 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   #  p = p + points(globalReturnX, globalReturnY)  
   #
   
-  returnableData = list(minstd = minstd, mu = mu, stdevs = stdevs, zbar = zbar, 
+  returnableData = list(data = as.data.frame(cbind(minstd,mu)), stdevs = stdevs, zbar = zbar, 
                         globalReturnX = globalReturnX, globalReturnY = globalReturnY, 
-                        tangencyPortfolio = tangencyPortfolio, globMinVariancePrtfolio = globMinVariancePrtfolio, pc = pc)
+                        tangencyPortfolio = tangencyPortfolio, globMinVariancePrtfolio = globMinVariancePrtfolio, pc = pc, plot = effrontier)
   
   returnableData
 }
+
+getEffPlot = function(ticker){
+  library(stats)#! load early
+  library(tseries)#! load early
+  library(stockPortfolio)#! load early
+  library(ggplot2)
+ #ticker = c("RHI",  "GT",   "SPG",  "CTXS", "PH",   "AMGN", "MSFT", "OMC" )
+  userPrtf = as.data.frame(t(getWeighted()))
+  targetScale = userPrtf$expectedPrtfReturn
+  data = collectData(ticker, zoom = 500, end = "2014-08-31", start = "2014-07-30", targetScale)
+  #dfDemo <- structure(list(Y = c(0.906231077471568, 0.569073561538186,0.0783433165521566, 0.724580209473378, 0.359136092118470, 0.871301974471722,0.400628333618918, 1.41778205350433, 0.932081770977729, 0.198188442350644), X = c(0.208755495088456, 0.147750173706688, 0.0205864576474412,0.162635017485883, 0.118877260137735, 0.186538613831806, 0.137831912094464,0.293293029083812, 0.219247919537514, 0.0323148791663826), Z = c(11114987L,11112951L,11713300L, 14331476L, 11539301L, 12233602L, 15764099L, 10191778L,12070774L, 11836422L, 15148685L)), .Names = c("Y", "X", "Z"), row.names = c(NA, 10L), class = "data.frame")
+  returns = qplot(x = data$data$minstd, y = data$data$mu, geom=c("path")) + geom_line(fill = "blue", colour="grey", alpha = 1/3 )#geom = c("line", "smooth")
+  returns = returns + geom_point(data=data$pc$pointsDF, aes(x = minstd, y = mu, colour = minstd)) + scale_colour_gradient(low = "green",high = "red")
+  returns = returns + geom_point(data = userPrtf, aes(y = expectedPrtfReturn, x = prtfVariance, colour = prtfVariance))  + annotate("text", x = userPrtf$prtfVariance, y = userPrtf$expectedPrtfReturn, label = "User Portfolio", hjust=-0.1, vjust=0) 
+  print(returns)
+  #then js is ready to call the tables as necessary!!
+  save(data, file = "~/test3/data/prtfdata.Rda")
+  #getTablesOfEffPlot(data) would do this if using R2HTML 
+  returns
+}
+
+getTablesOfEffPlot = function(){
+  data = load(file = "~/test3/data/prtfdata.Rda")
+  outtableHtml = as.data.frame(data$pc[[2]]$portfolioWeights)
+  #loop to do this to every point:
+  names(outtableHtml) = (paste0(round(data$pc[[2]]$risk,3) , " <-V R-> " , data$pc[[2]]$expectedReturn))
+  htmtable = xtable(outtableHtml)#look into other args
+  x = print(htmtable, type = html)
+  x
+  #using R2HTML : writes the tables to a file, but updates that file, so it is a viable option  
+  #varH = HTML(as.data.frame(outtableHtml), file = "testTable.html")
+}
+#data = collectData(ticker, zoom = 100, end = "2014-08-31", start = "2014-07-30")
+#allData = rbind(data$data, data$pc$pointsDF)
+#prtfPoints = gvisScatterChart(data = data$pc$pointsDF)
+#effPoints = gvisLineChart(data = data$data)
+#mer = gvisMerge(prtfPoints, effPoints)
+#plot(prtfPoints)
+#plot(effPoints)
+#bub = gvisMotionChart(allData)
+#plot(bub)

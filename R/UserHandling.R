@@ -1,6 +1,6 @@
 #library(opencpu)
 l1 = new.env(hash = TRUE, parent = parent.frame(), size = 29L)
-load("data/logins.Rda",  envir = l1)
+load("~/test3/data/logins.Rda",  envir = l1)
 
 persistData = function(logins, filename){
   target = paste0("/Users/gctribeiro/test3/data/", filename,".Rda")#this must be solved on the server itself., how do you access session variables?

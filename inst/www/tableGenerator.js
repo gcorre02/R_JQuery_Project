@@ -39,6 +39,7 @@ function generateTable(inTicker,inPercentage, correspondingValue){
   createElement("td","","","lastRow","percentageResult",inPercentage);
   
   // create submit button for the portfolio
+  
   createElement("BUTTON","disabled","disabled","portfolio","submitWeights","Submit Portfolio"); 
   if(parseFloat(inPercentage) == 100){
     activateButton();

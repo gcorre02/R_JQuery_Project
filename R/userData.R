@@ -5,6 +5,7 @@
 
 library(ggplot2)
 
+
 createUserData = function(username, password){
   userData = vector("list",0)
   userDetail = list(user = username, pass = password, numberOfPortfolios = 0)
@@ -36,7 +37,7 @@ createPortfolio = function(portfolioDataFrame, portfolioName, typeOfPortfolio){
 #-> collect data from website and generate portfolio dataframe
 receivePortfolio = function(id, ticker, company, percentage){
   assets = data.frame(cbind(id, ticker, company, percentage))
-  save(assets, file = "/Users/gctribeiro/test3/data/assetsTest.Rda") #belongs to addPortfolio.... methinks
+  save(assets, file = "~/test3/data/assetsTest.Rda") #belongs to addPortfolio.... methinks
   #createPortfolio()
   #addPorfolio
   #createUserData must be asscoiated with the creation of a new user, and then the html must maintain the user login info to pass as argument in here!
@@ -53,11 +54,24 @@ receivePortfolio = function(id, ticker, company, percentage){
 
 
 getEff = function(){
-  ticker = as.character(assets$ticker)
-
-  prtf = collectData(ticker)
-  contentsX = prtf$minstd
-  contentsY = prtf$mu
+ # library(googleVis)#needs to be imported somewhere else, namespace ?
+  
+#  m = gvisMotionChart(Fruits,'Fruit','Year')
+#  collage = c(m$html$header, m$html$chart,m$html$caption,m$html$footer)
+  #collage = m$html$chart
+#  cat(collage, file="/Library/Frameworks/R.framework/Versions/3.1/Resources/library/test3/www/tmp.html")
+#  collage
+ # cat(m$html$chart)
+  #  load("~/test3/data/assetsTest.Rda")
+  #  ticker = as.character(assets$ticker)
+  #
+  #prtf = collectData(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-30") #user inputs
+  #contentsX = prtf$minstd
+  #contentsY = prtf$mu
   #ggplot(data = contents, ymin=lowpoint, aes(Date, ymin=lowpoint, ymax=Close)) + geom_ribbon(color="black", fill="lightblue", alpha=0.5) + ylim(range(contents$Close));  
-  result = qplot(prtf$minstd, prtf$mu, type = "l")
+  #  qplot(prtf$minstd, prtf$mu, type = "l")+  geom_ribbon(color="black", fill="lightblue", alpha=0.5) + aes(ymin = -0.5, ymax = 1)
+  
+  load(file = "~/test3/data/assetsTest.Rda")
+  ticker = assets$ticker
+  getEffPlot(ticker)
 }

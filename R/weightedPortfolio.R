@@ -2,14 +2,19 @@
 library(stats)
 library(tseries)
 library(stockPortfolio)
-source("R/generateWeightDist.R")
+source("~/test3/R/generateWeightDist.R")
 
-sampleSize = 8
-sp500Tickers = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
-ticker = sp500Tickers#sample(sp500Tickers, sampleSize)
-acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-01-01")  
+getWeighted = function(){
+  library(stats)
+  library(tseries)
+  library(stockPortfolio)
+  
+load(file = "~/test3/data/assetsTest.Rda")
+ticker = assets$ticker
+#ticker = sample(sp500Tickers, sampleSize)
+acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-07-30")  
 
-collectionWeights = rep(1/sampleSize,sampleSize);
+collectionWeights = as.numeric(as.character(assets$percentage))
 
 #collectionWeights = getSampleDistributionOfWeights(30)
 #collectionWeights = c(0.4,0.6)
@@ -47,35 +52,11 @@ weightsMatrix = collectionWeights %*% t(collectionWeights)
 portfolioVar = sum(StocksCov*weightsMatrix )#* collectionProbs)
 
 #results
-eRp = ((1 + wmeanReturn)^(365)-1)*100 # average annual rate of return
-VarRp = sqrt(portfolioVar)
-eRp
-VarRp
+eRp = wmeanReturn*100 #((1 + wmeanReturn)^(365)-1)*100 # average annual rate of return
+VarRp = sqrt(portfolioVar)/100 # big????
 
-Wa = 0.4
-Wb = 0.6
-#pricesA = sample(seq(7,15, by = 0.0004), size = 500)
-#pricesB = sample(seq(9,22, by = 0.0004), size = 500)
+returnable = c(VarRp, eRp);
+names(returnable) = c("prtfVariance","expectedPrtfReturn");
+returnable
+}
 
-pricesA = allStockHistory[,1]
-pricesB = allStockHistory[,2]
-
-Ra = mean(acquiredStocks$R[,1])*100 #verified this is the real value
-Rb = mean(acquiredStocks$R[,2])*100
-Ra
-Rb
-SDa = sd(pricesA)
-SDb = sd(pricesB)
-SDa
-SDb
-corAB = cor(pricesA,pricesB)
-corBA = cor(pricesA,pricesB)
-
-eReturn = Wa*Ra + Wb*Rb
-prtfVar = Wa*Wa*SDa*SDa + Wb*Wb*SDb*SDb + Wa*Wb*SDa*SDb*corAB + Wb*Wa*SDb*SDa*corBA
-
-eRp
-VarRp
-
-eReturn
-sqrt(prtfVar)

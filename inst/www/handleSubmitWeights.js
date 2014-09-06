@@ -57,12 +57,46 @@ function doAbunchOfStuffWithR(){
         });
         
   //publish eff frontier plot to div<effPlot>
-        var recquestEffofPortfolio = $("#portfolio").rplot("getEff", {
+        /*
+        var recquestEffofPortfolio = ocpu.rpc("getEff", {
+          
+        },function(output){
+          alert(String(eval(output)));
+          //alert($.("#prtfGraph").html());
+            $("#prtfGraph").removeAttr("hidden");
+         //$("#prtfGraph").attr("srcdoc",String(output));
+         // $("#prtfGraph").html("<iframe srcdoc =\""+ String(eval(output)) + "\"></iframe>");
+     //works:
+          $("#prtfGraph").attr("src","tmp.html");
+
+          //$("#prtfGraph").html("<iframe src = \"tmp.html\"></iframe>");
         }).fail(function(){
-          alert("Failed to plot stock: " + req.responseText)
-        });
+          alert("Failed to plot stock: " + recquestEffofPortfolio.responseText)
+        });*/
   
+        var plon = $("#plotable").rplot("getEff", {
+          
+        }).fail(function(){
+          alert("Failed to plot stock: " + plon.responseText)
+        });
+        $("#plotable").find('div').css("height","600");
         
+        var getWeightPoint = ocpu.rpc("getWeighted",{},
+        function(output){
+        //  alert(String(output));
+        $("#weightedResults").html("<p>"+String(output)+"</p>");
+        }).fail(function(){
+          alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
+        });
+  /*      
+        var populateWeightTables = ocpu.rpc("getTablesOfEffPlot",{},
+        function(output){
+          alert(String(output));
+        $("#generatedPrtf").html(String(output));
+        }).fail(function(){
+          alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
+        });
+*/        
   //disable searchby buttons until submit
   // ask user for a name for the portfolio...
   //send portfolio ticker and weight to R and persist it under the user
