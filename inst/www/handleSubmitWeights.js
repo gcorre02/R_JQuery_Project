@@ -88,19 +88,32 @@ function doAbunchOfStuffWithR(){
         }).fail(function(){
           alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
         });
-  /*      
-        var populateWeightTables = ocpu.rpc("getTablesOfEffPlot",{},
-        function(output){
-          alert(String(output));
-        $("#generatedPrtf").html(String(output));
-        }).fail(function(){
-          alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
-        });
-*/        
+       
+        generateTableButtons();
+        
+       
+      
   //disable searchby buttons until submit
   // ask user for a name for the portfolio...
   //send portfolio ticker and weight to R and persist it under the user
   //ask r for a plot of the portfolio 
   //then ask for eff frontier plot using the assets 
   //then allow user to hover over the points, and if selected, produce a new weight distribution table
+}
+
+function generateTableButtons(){
+  
+  createElement("BUTTON", "", "", "tableButtons", "firstprtftable","produce weights table");
+  $("#firstprtftable").on("click",function(){populateWTables()});
+}
+
+function populateWTables(){ 
+  var populateWeightTables = ocpu.rpc("getTablesOfEffPlot",{},
+        function(output){
+          alert(String(output));
+        $("#generatedPrtf").html(String(output));
+        }).fail(function(){
+          alert("failed to publish generated efficient portfolio tables: " + populateWeightTables.responseText)
+        });
+        
 }

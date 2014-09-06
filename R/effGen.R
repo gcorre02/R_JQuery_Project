@@ -269,25 +269,26 @@ getEffPlot = function(ticker){
  #ticker = c("RHI",  "GT",   "SPG",  "CTXS", "PH",   "AMGN", "MSFT", "OMC" )
   userPrtf = as.data.frame(t(getWeighted()))
   targetScale = userPrtf$expectedPrtfReturn
-  data = collectData(ticker, zoom = 500, end = "2014-08-31", start = "2014-07-30", targetScale)
+  effData = collectData(ticker, zoom = 500, end = "2014-08-31", start = "2014-07-30", targetScale)
   #dfDemo <- structure(list(Y = c(0.906231077471568, 0.569073561538186,0.0783433165521566, 0.724580209473378, 0.359136092118470, 0.871301974471722,0.400628333618918, 1.41778205350433, 0.932081770977729, 0.198188442350644), X = c(0.208755495088456, 0.147750173706688, 0.0205864576474412,0.162635017485883, 0.118877260137735, 0.186538613831806, 0.137831912094464,0.293293029083812, 0.219247919537514, 0.0323148791663826), Z = c(11114987L,11112951L,11713300L, 14331476L, 11539301L, 12233602L, 15764099L, 10191778L,12070774L, 11836422L, 15148685L)), .Names = c("Y", "X", "Z"), row.names = c(NA, 10L), class = "data.frame")
-  returns = qplot(x = data$data$minstd, y = data$data$mu, geom=c("path")) + geom_line(fill = "blue", colour="grey", alpha = 1/3 )#geom = c("line", "smooth")
-  returns = returns + geom_point(data=data$pc$pointsDF, aes(x = minstd, y = mu, colour = minstd)) + scale_colour_gradient(low = "green",high = "red")
+  returns = qplot(x = effData$data$minstd, y = effData$data$mu, geom=c("path")) + geom_line(fill = "blue", colour="grey", alpha = 1/3 )#geom = c("line", "smooth")
+  returns = returns + geom_point(data=effData$pc$pointsDF, aes(x = minstd, y = mu, colour = minstd)) + scale_colour_gradient(low = "green",high = "red")
   returns = returns + geom_point(data = userPrtf, aes(y = expectedPrtfReturn, x = prtfVariance, colour = prtfVariance))  + annotate("text", x = userPrtf$prtfVariance, y = userPrtf$expectedPrtfReturn, label = "User Portfolio", hjust=-0.1, vjust=0) 
   print(returns)
   #then js is ready to call the tables as necessary!!
-  save(data, file = "~/test3/data/prtfdata.Rda")
+  save(effData, file = "~/test3/data/prtfdata.Rda")
   #getTablesOfEffPlot(data) would do this if using R2HTML 
   returns
 }
 
 getTablesOfEffPlot = function(){
-  data = load(file = "~/test3/data/prtfdata.Rda")
-  outtableHtml = as.data.frame(data$pc[[2]]$portfolioWeights)
+  library(xtable)
+  load(file = "~/test3/data/prtfdata.Rda")
+  outtableHtml = as.data.frame(effData$pc[[2]]$portfolioWeights)
   #loop to do this to every point:
-  names(outtableHtml) = (paste0(round(data$pc[[2]]$risk,3) , " <-V R-> " , data$pc[[2]]$expectedReturn))
+  names(outtableHtml) = (paste0(round(effData$pc[[2]]$risk,3) , " <-V R-> " , effData$pc[[2]]$expectedReturn))
   htmtable = xtable(outtableHtml)#look into other args
-  x = print(htmtable, type = html)
+  x = print(htmtable, type = "html")
   x
   #using R2HTML : writes the tables to a file, but updates that file, so it is a viable option  
   #varH = HTML(as.data.frame(outtableHtml), file = "testTable.html")
