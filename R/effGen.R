@@ -357,8 +357,26 @@ getReturnsFromDatabase = function(ticker){
 }
 
 persistSP500DB = function(){#need to handle time frames around here!
- 
   ticker = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
   acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30") 
-  save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
+  #save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  acq = convertAcqtoDF(acquiredStocks)
+  rwrite = dbWriteTable(con, "fullSP500returns", acq$R, overwrite = T)
+  cwrite = dbWriteTable(con, "fullSP500close", acq$Close, overwrite = T)
+  dbDisconnect(con)
+  return(rwrite&cwrite)
+}
+#had to convert this large object into something SQLite can understand
+convertAcqtoDF = function(acquiredStocks){
+  returnable = vector("list",0)
+  returnable$R = as.data.frame(acquiredStocks$R, stringsAsFactors = FALSE)
+  fullClose = data.frame(row.names = acquiredStocks$full$A$Date,stringsAsFactors = FALSE)
+  for(item in acquiredStocks$full){
+    fullClose = cbind(fullClose, item$Close)
+  }
+#  fullClose = cbind(acquiredStocks$full$A$Date,fullClose)
+  colnames(fullClose) = acquiredStocks$ticker
+  returnable$Close = fullClose
+  return(returnable)
 }
