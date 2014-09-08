@@ -1,4 +1,3 @@
-#library(opencpu)
 l1 = new.env(hash = TRUE, parent = parent.frame(), size = 29L)
 load("~/test3/data/logins.Rda",  envir = l1)
 
@@ -26,7 +25,7 @@ addUser = function(username, password){
   return("unsuccessful")
 }
 
-createNewUserDB = function(){
+createNewUserDBnoSQL = function(){
   logins = as.data.frame("user",row.names="admin", col.names="password")
   colnames(logins) = "password"
   persistData(logins,"logins")

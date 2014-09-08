@@ -1,7 +1,5 @@
 #this script is responsible for identifying the risk and expected return of the inputed portfolio distribution
-library(stats)
-library(tseries)
-library(stockPortfolio)
+
 source("~/test3/R/generateWeightDist.R")
 
 getWeighted = function(){

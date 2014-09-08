@@ -1,9 +1,6 @@
 ##################################################################
 ##setup data
 
-library(stats)
-library(tseries)
-library(stockPortfolio)
 
 #ticker = c("CMG","LNKD","AMZN","GOOGL","WFC","SBUX")
 
@@ -95,7 +92,6 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
 
 ##function
 collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-30", targetScale, local = T){#dates here matter, but only when getReturnsFromDatabase can handle it.
-  #library(parallel)
   #zoom = 100
   sourceData = 1
   sampleSize = 8
@@ -164,7 +160,7 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   #% Efficient Frontier
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   min = floor(targetScale) - 0.5#MAGIC NUMBER
-  max = floor(targetScale) + 3.5#MAGIC NUMBER
+  max = floor(targetScale) + 2.5#MAGIC NUMBER
   mu = seq(from = (min-0.25), to = (max+0.25), by = (max-min)/zoom)
 #  mu = mu/zoom;
 
@@ -268,10 +264,7 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
 }
 
 getEffPlot = function(ticker, local = T){
-  library(stats)#! load early
-  library(tseries)#! load early
-  library(stockPortfolio)#! load early
-  library(ggplot2)
+  
  #ticker = c("RHI",  "GT",   "SPG",  "CTXS", "PH",   "AMGN", "MSFT", "OMC" )
   userPrtf = as.data.frame(t(getWeighted()), stringsAsFactors = FALSE)
   targetScale = userPrtf$expectedPrtfReturn
@@ -292,7 +285,6 @@ getEffPlot = function(ticker, local = T){
 }
 
 getTablesOfEffPlot = function(targetreturn){
-  library(xtable)
   load(file = "~/test3/data/prtfdata.Rda")
   targetreturn = as.numeric(targetreturn)
   outtableHtml = as.data.frame(effData$pc[[targetreturn]]$portfolioWeights, stringsAsFactors = FALSE)
@@ -326,7 +318,6 @@ getCompaniesFromTickers = function(tickers){
   companies
 }
 solveWCompSingular = function(somematrix){
-  library(MASS)
   returnable = tryCatch({
     solve(somematrix)
   }, warning = function(w) {
@@ -366,9 +357,7 @@ getReturnsFromDatabase = function(ticker){
 }
 
 persistSP500DB = function(){#need to handle time frames around here!
-  library(stats)#! load early
-  library(tseries)#! load early
-  library(stockPortfolio)#! load early
+ 
   ticker = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
   acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30") 
   save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)

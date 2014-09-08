@@ -3,7 +3,6 @@
 # > all user's portfolios
 # > accessed to add more user portfolios
 
-library(ggplot2)
 
 
 createUserData = function(username, password){

@@ -62,7 +62,7 @@ $(document).ready(function(){
         var pass = $("#pass").val();
         //alert("loginbutton pressed " + user + " " + pass);
 
-        var validateLogin = ocpu.rpc("checkLogin", {
+        var validateLogin = ocpu.rpc("validateLoginDetails", {
           user : user,
           pass : pass
         }, function(output){
@@ -103,8 +103,8 @@ function addInputMethod() {
         var regpass = $("#regPass").val();
         //alert("registerbutton pressed " + reguser + " " + regpass);
         
-        var validateRegister = ocpu.rpc("addUser", {
-          username : reguser,
+        var validateRegister = ocpu.rpc("addNewLogin", {
+          user : reguser,
           password : regpass
         }, function(output){
           //should link somewhere
