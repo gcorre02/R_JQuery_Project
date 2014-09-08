@@ -36,11 +36,11 @@ $(document).ready(function(){
         */
         
         //publish plot
-        var plo = $("#plotable").rplot("getQuandlPlot", {
-          //target : $("#SP500").val() 
-          target : "GOOG/EPA_LVOL"
+        var plo = $("#plotable").rplot("getSP500", {
+          //target : $("#sp500input").val() 
+          sample : $("#sp500input").val()
         }).fail(function(){
-          alert("Failed to plot stock: " + req.responseText)
+          alert("Failed to plot stock: " + plo.responseText)
         });
     
         //if R returns an error, alert the error message

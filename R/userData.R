@@ -36,8 +36,8 @@ createPortfolio = function(portfolioDataFrame, portfolioName, typeOfPortfolio){
 
 #-> collect data from website and generate portfolio dataframe
 receivePortfolio = function(id, ticker, company, percentage){
-  assets = data.frame(cbind(id, ticker, company, percentage))
-  save(assets, file = "~/test3/data/assetsTest.Rda") #belongs to addPortfolio.... methinks
+  assets = data.frame(cbind(id, ticker, company, percentage), stringsAsFactors = FALSE)
+  save(assets, file = "~/test3/data/assetsTest.Rda",compress = F) #belongs to addPortfolio.... methinks
   #createPortfolio()
   #addPorfolio
   #createUserData must be asscoiated with the creation of a new user, and then the html must maintain the user login info to pass as argument in here!

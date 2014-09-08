@@ -102,16 +102,43 @@ function doAbunchOfStuffWithR(){
 }
 
 function generateTableButtons(){
-  
+  $("#tableButtons").html("<p>Choose Target Portfolio by Return, but currently just count the points from the lowest y , beginning in 2...</p>");
+  createElement("input", "type", "text", "tableButtons", "chooseReturn","");
   createElement("BUTTON", "", "", "tableButtons", "firstprtftable","produce weights table");
-  $("#firstprtftable").on("click",function(){populateWTables()});
+  
+  $("#firstprtftable").on("click",function(){
+    alert("you chose number : "+ $("#chooseReturn").val());
+    populateWTables($("#chooseReturn").val());
+    
+  });
 }
 
-function populateWTables(){ 
-  var populateWeightTables = ocpu.rpc("getTablesOfEffPlot",{},
+//tis requesting the index of the array, not the actual return!
+//also, later user can input the range of values he wants to produce optimized portfolios for and the step around it, this input box[chooseReturn] will show this data straight out.
+function populateWTables(targetreturn){ 
+  var populateWeightTables = ocpu.rpc("getTablesOfEffPlot",{
+  targetreturn : targetreturn
+  },
         function(output){
           alert(String(output));
         $("#generatedPrtf").html(String(output));
+//        $("#generatedPrtf").find('th')attr("class","");
+        $("#generatedPrtf").find('tr').each(function(i){
+          if(i == 0){
+            $(this).find('th').each(function(i){
+              if(i == 0){
+                $(this).html("Ticker");
+              } else {
+                $(this).css("text-align","right");
+              }
+            })
+          }
+          else{
+            $(this).attr("class","success");
+          //  $(this).find('td').each(function(){
+          }
+        });
+        
         }).fail(function(){
           alert("failed to publish generated efficient portfolio tables: " + populateWeightTables.responseText)
         });

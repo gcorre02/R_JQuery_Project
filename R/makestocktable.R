@@ -37,6 +37,9 @@ getOtherValue = function(valueType, namtckr){
 getCompanyByTicker = function(namtckr){
   current = makestocktable()
   result = current$Company[which(current$Ticker == namtckr)]
+  if(length(result) == 0){
+    result = "noname"
+  }
   result
 }
 

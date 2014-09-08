@@ -70,7 +70,7 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
     
     
     #add points to the graph
-    points(std_s,mu_s)
+    #points(std_s,mu_s)
     
     index = index + 1
     
@@ -85,7 +85,7 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
     }
     
   }
-  pointsDF = data.frame()
+  pointsDF = data.frame(stringsAsFactors = FALSE)
   for(item in portfolioCollection){pointsDF = rbind(pointsDF,cbind(item$risk,item$expectedReturn))}
   names(pointsDF) = c("minstd","mu")
   portfolioCollection$pointsDF = pointsDF
@@ -94,15 +94,21 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
 
 
 ##function
-collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-31", targetScale){
+collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-30", targetScale, local = T){#dates here matter, but only when getReturnsFromDatabase can handle it.
+  #library(parallel)
   #zoom = 100
   sourceData = 1
   sampleSize = 8
   targetReturn = 2
 #  sampleSize = 18
-  #ticker = sample(sp500Tickers, sampleSize)
-  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = end, start = start)  
+#  ticker = sample(sp500Tickers, sampleSize)
   
+  if(local){
+    acquiredStocks = getReturnsFromDatabase(ticker)
+  } else { 
+    acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = end, start = start)
+  }
+
   allStockHistory = NULL
   for(i in 1:length(acquiredStocks$ticker)){
     if(is.null(allStockHistory)){
@@ -125,7 +131,7 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   ######################################################
   S = stocksVariance
   zbar = matrix(averageReturn)
-  
+  rownames(zbar) = names(averageReturn)
   #% Target Return in %percentage%
   #mu_tar = 2
   mu_tar = targetReturn
@@ -145,9 +151,9 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   #D = A*C-B^2
   
   #provision the use of GINV() for the out of size matrixes
-  A = sum(solve(S)) #solve(S) does the propper algebraic based inverse operation of the matrix
-  B = colSums(solve(S))%*%zbar
-  C = t(zbar) %*% solve(S) %*%zbar
+  A = sum(solveWCompSingular(S)) #solve(S) does the propper algebraic based inverse operation of the matrix
+  B = colSums(solveWCompSingular(S))%*%zbar
+  C = t(zbar) %*% solveWCompSingular(S) %*%zbar
   D <- A*C-B^2
   
   #% Calculate Lambda and Gamma
@@ -161,14 +167,14 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   max = floor(targetScale) + 3.5#MAGIC NUMBER
   mu = seq(from = (min-0.25), to = (max+0.25), by = (max-min)/zoom)
 #  mu = mu/zoom;
-  
+
   minvar = ((A*mu^2)-2*B*mu+C)/D;
   minstd = sqrt(minvar);
   
   #remove
-  effrontier = plot(minstd, mu, main = 'Efficient Frontier with Individual Securities', ylab = ('Expected Return (%)'), xlab = ('Standard Deviation'), type = "l")
+  #effrontier = plot(minstd, mu, main = 'Efficient Frontier with Individual Securities', ylab = ('Expected Return (%)'), xlab = ('Standard Deviation'), type = "l")
   # this adds the individual points of each security
-  points(stdevs,zbar, type = "p")
+#  points(stdevs,zbar, type = "p")
   
   
   
@@ -183,14 +189,14 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   std_g = sqrt(var_g)
   
   #% Minimum Variance Portfolio Weights
-  w_g = (colSums(solve(S)))/A
+  w_g = (colSums(solveWCompSingular(S)))/A
   
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   #% Tangency Portfolio with a Risk Free Rate = 0
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   #% Weights for Tangency Portfolio, R=0
-  w_d = (solve(S)%*%zbar)/B[1,1]
+  w_d = (solveWCompSingular(S)%*%zbar)/B[1,1]
   
   #% Expected Return of Tangency Portfolio
   mu_d = t(w_d)%*%zbar
@@ -229,18 +235,18 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
     globalReturnY = c(globalReturnY, pc[[i]]$expectedReturn)
   }
   
-  plotPoint(mu_d,std_d)
-  plotPoint(mu_g,std_g)
+#  plotPoint(mu_d,std_d)
+#  plotPoint(mu_g,std_g)
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   #% Plot Efficient Frontier and Key Points
   #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  points(std_g,mu_g)#'Global Minimum Variance Portfolio'
-  points(std_d,mu_d)#'Tangency Portfolio when R=0'
-  points(std_s,mu_s)#Portfolio with Target Return of 14%
-  plotPoint(mu_d,std_d)#indicate 'Tangency Portfolio when R=0'
-  plotPoint(mu_g,std_g)#indicate'Global Minimum Variance Portfolio'
-  plotPoint(mu_s,std_s)#Portfolio with Target Return of 14%
+#  points(std_g,mu_g)#'Global Minimum Variance Portfolio'
+#  points(std_d,mu_d)#'Tangency Portfolio when R=0'
+#  points(std_s,mu_s)#Portfolio with Target Return of 14%
+#  plotPoint(mu_d,std_d)#indicate 'Tangency Portfolio when R=0'
+#  plotPoint(mu_g,std_g)#indicate'Global Minimum Variance Portfolio'
+ # plotPoint(mu_s,std_s)#Portfolio with Target Return of 14%
   
   tangencyPortfolio = list( expectedReturn = mu_d, portfolioWeights = w_g, risk = std_g)
   globMinVariancePrtfolio = list( expectedReturn = mu_g, portfolioWeights = w_g, risk = std_g)
@@ -254,45 +260,82 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   #  p = p + points(globalReturnX, globalReturnY)  
   #
   
-  returnableData = list(data = as.data.frame(cbind(minstd,mu)), stdevs = stdevs, zbar = zbar, 
+  returnableData = list(data = as.data.frame(cbind(minstd,mu),stringsAsFactors = FALSE), stdevs = stdevs, zbar = zbar, 
                         globalReturnX = globalReturnX, globalReturnY = globalReturnY, 
-                        tangencyPortfolio = tangencyPortfolio, globMinVariancePrtfolio = globMinVariancePrtfolio, pc = pc, plot = effrontier)
+                        tangencyPortfolio = tangencyPortfolio, globMinVariancePrtfolio = globMinVariancePrtfolio, pc = pc)
   
   returnableData
 }
 
-getEffPlot = function(ticker){
+getEffPlot = function(ticker, local = T){
   library(stats)#! load early
   library(tseries)#! load early
   library(stockPortfolio)#! load early
   library(ggplot2)
  #ticker = c("RHI",  "GT",   "SPG",  "CTXS", "PH",   "AMGN", "MSFT", "OMC" )
-  userPrtf = as.data.frame(t(getWeighted()))
+  userPrtf = as.data.frame(t(getWeighted()), stringsAsFactors = FALSE)
   targetScale = userPrtf$expectedPrtfReturn
-  effData = collectData(ticker, zoom = 500, end = "2014-08-31", start = "2014-07-30", targetScale)
+  effData = collectData(ticker, zoom = 500, end = "2014-08-31", start = "2014-07-30", targetScale,local)# using local makes it lose the names of the tickers...
+  #then js is ready to call the tables as necessary!!
+   save(effData, file = "~/test3/data/prtfdata.Rda", compress = F)
   #dfDemo <- structure(list(Y = c(0.906231077471568, 0.569073561538186,0.0783433165521566, 0.724580209473378, 0.359136092118470, 0.871301974471722,0.400628333618918, 1.41778205350433, 0.932081770977729, 0.198188442350644), X = c(0.208755495088456, 0.147750173706688, 0.0205864576474412,0.162635017485883, 0.118877260137735, 0.186538613831806, 0.137831912094464,0.293293029083812, 0.219247919537514, 0.0323148791663826), Z = c(11114987L,11112951L,11713300L, 14331476L, 11539301L, 12233602L, 15764099L, 10191778L,12070774L, 11836422L, 15148685L)), .Names = c("Y", "X", "Z"), row.names = c(NA, 10L), class = "data.frame")
   returns = qplot(x = effData$data$minstd, y = effData$data$mu, geom=c("path")) + geom_line(fill = "blue", colour="grey", alpha = 1/3 )#geom = c("line", "smooth")
-  returns = returns + geom_point(data=effData$pc$pointsDF, aes(x = minstd, y = mu, colour = minstd)) + scale_colour_gradient(low = "green",high = "red")
-  returns = returns + geom_point(data = userPrtf, aes(y = expectedPrtfReturn, x = prtfVariance, colour = prtfVariance))  + annotate("text", x = userPrtf$prtfVariance, y = userPrtf$expectedPrtfReturn, label = "User Portfolio", hjust=-0.1, vjust=0) 
+  returns = returns + geom_point(data=effData$pc$pointsDF, aes(x = minstd, y = mu, colour = minstd), size = 3.5) + scale_colour_gradient(low = "green",high = "red")
+  returns = returns + geom_point(data = userPrtf, aes(y = expectedPrtfReturn, x = prtfVariance, colour = prtfVariance), size = 5)  + annotate("text", x = userPrtf$prtfVariance, y = userPrtf$expectedPrtfReturn, label = "User Portfolio", hjust=-0.1, vjust=0) 
+  stockPoints = as.data.frame(cbind(effData$stdevs, effData$zbar),stringsAsFactors = FALSE)
+  names(stockPoints) = c("stdevs","zbar")
+  returns = returns + geom_point(data = stockPoints, aes(x = stdevs, y = zbar , colour = stdevs), size = 3) + annotate("text", y = stockPoints$zbar, x = stockPoints$stdevs, label = rownames(stockPoints), size = 2,hjust=-0.1, vjust=0)
   print(returns)
-  #then js is ready to call the tables as necessary!!
-  save(effData, file = "~/test3/data/prtfdata.Rda")
+ 
   #getTablesOfEffPlot(data) would do this if using R2HTML 
   returns
 }
 
-getTablesOfEffPlot = function(){
+getTablesOfEffPlot = function(targetreturn){
   library(xtable)
   load(file = "~/test3/data/prtfdata.Rda")
-  outtableHtml = as.data.frame(effData$pc[[2]]$portfolioWeights)
+  targetreturn = as.numeric(targetreturn)
+  outtableHtml = as.data.frame(effData$pc[[targetreturn]]$portfolioWeights, stringsAsFactors = FALSE)
   #loop to do this to every point:
-  names(outtableHtml) = (paste0(round(effData$pc[[2]]$risk,3) , " <-V R-> " , effData$pc[[2]]$expectedReturn))
+  names(outtableHtml) = (paste0("Expected Return of ", round(effData$pc[[targetreturn]]$expectedReturn,3) , " for a risk of " , round(effData$pc[[targetreturn]]$risk,3)))
   htmtable = xtable(outtableHtml)#look into other args
-  x = print(htmtable, type = "html")
+  x = print(htmtable, type = "html", html.table.attributes='class="table table-striped table-hover"  align="center" ',html.row.attributes='class = "success"')
   x
   #using R2HTML : writes the tables to a file, but updates that file, so it is a viable option  
   #varH = HTML(as.data.frame(outtableHtml), file = "testTable.html")
 }
+
+#than transform this into a sampling funciton of the sp500, with n of assets as args
+getSP500 = function(sample){
+  sample = as.numeric(as.character(sample))
+  sp500Tickers = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
+  sp500Tickers = sample(sp500Tickers, sample)
+  receivePortfolio(id = (1:sample) ,ticker = sp500Tickers ,company = getCompaniesFromTickers(sp500Tickers) ,percentage = rep(1/sample*100, sample))#handle adding company names matrix
+  getEffPlot(sp500Tickers, T)
+}
+getCompaniesFromTickers = function(tickers){
+  pos = 0
+  for(ticker in tickers){
+    if(pos == 0){
+      companies = getCompanyByTicker(ticker)
+    } else {
+      companies = c(companies, getCompanyByTicker(ticker))
+    }
+    pos = pos + 1
+  }
+  companies
+}
+solveWCompSingular = function(somematrix){
+  library(MASS)
+  returnable = tryCatch({
+    solve(somematrix)
+  }, warning = function(w) {
+    print(w)
+  }, error = function(e) {
+    ginv(somematrix)
+  })
+}
+
 #data = collectData(ticker, zoom = 100, end = "2014-08-31", start = "2014-07-30")
 #allData = rbind(data$data, data$pc$pointsDF)
 #prtfPoints = gvisScatterChart(data = data$pc$pointsDF)
@@ -302,3 +345,31 @@ getTablesOfEffPlot = function(){
 #plot(effPoints)
 #bub = gvisMotionChart(allData)
 #plot(bub)
+
+getReturnsFromDatabase = function(ticker){
+  
+  tryCatch({
+    load(file = "~/test3/data/acquiredStocks.Rda")
+  }, error = function(e) {
+    persistSP500DB()
+    load(file = "~/test3/data/acquiredStocks.Rda")
+  })
+  R = acquiredStocks$R[,ticker]
+  ticker = ticker
+  period = acquiredStocks$period
+  start = acquiredStocks$start
+  end = acquiredStocks$end
+  full = acquiredStocks$full[ticker]
+  returnable = list(R = R, ticker = ticker, period = period, start = start, end = end, full = full)
+  class(returnable) = "stockReturns"
+  return(returnable)
+}
+
+persistSP500DB = function(){#need to handle time frames around here!
+  library(stats)#! load early
+  library(tseries)#! load early
+  library(stockPortfolio)#! load early
+  ticker = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
+  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30") 
+  save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
+}

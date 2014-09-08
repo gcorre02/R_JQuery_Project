@@ -8,7 +8,7 @@ persistData = function(logins, filename){
   unlockBinding("logins", l1)
   assign("logins", logins, envir = l1) 
   lockBinding("logins", l1)
-  save(logins, file = target)
+  save(logins, file = target, compress = F)
   #saveRDS(data,target)
 }
 

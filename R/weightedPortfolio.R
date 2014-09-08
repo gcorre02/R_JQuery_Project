@@ -8,13 +8,19 @@ getWeighted = function(){
   library(stats)
   library(tseries)
   library(stockPortfolio)
-  
+
+local = T # make this an input
 load(file = "~/test3/data/assetsTest.Rda")
 ticker = assets$ticker
 #ticker = sample(sp500Tickers, sampleSize)
-acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-07-30")  
+if(local){
+  acquiredStocks = getReturnsFromDatabase(ticker)
+} else { 
+  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-07-30") 
+}
+ 
 
-collectionWeights = as.numeric(as.character(assets$percentage))
+collectionWeights = as.numeric(as.character(assets$percentage))/100
 
 #collectionWeights = getSampleDistributionOfWeights(30)
 #collectionWeights = c(0.4,0.6)
@@ -53,7 +59,7 @@ portfolioVar = sum(StocksCov*weightsMatrix )#* collectionProbs)
 
 #results
 eRp = wmeanReturn*100 #((1 + wmeanReturn)^(365)-1)*100 # average annual rate of return
-VarRp = sqrt(portfolioVar)/100 # big????
+VarRp = sqrt(portfolioVar)#/100 # big???? twas because the % of the weights weren't normalized at input
 
 returnable = c(VarRp, eRp);
 names(returnable) = c("prtfVariance","expectedPrtfReturn");
