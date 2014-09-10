@@ -1,3 +1,4 @@
+#this whole file is redundant
 l1 = new.env(hash = TRUE, parent = parent.frame(), size = 29L)
 load("~/test3/data/logins.Rda",  envir = l1)
 

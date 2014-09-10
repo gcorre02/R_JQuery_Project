@@ -1,39 +1,14 @@
 $(document).ready(function(){
   //alert("the thing was");
-  alert("this version");
+  alert("this new version");
   
         $("#submitbutton").on("click", function(){
         //disable the button to prevent multiple clicks
         $("#submitbutton").attr("disabled", "disabled");
-        //alert("inside the button");
-        //read the value for 'myname'
-        //var myname = $("#namefield").val();
+        
         var myname = $("#fname").val() + " " + $("#lname").val();
         //perform the request
         
-        var req = ocpu.rpc("sayHello", {
-          myname : myname
-        }, function(output){
-          $("#output").text(output);
-          alert(output);
-        });
-        
-        var reques = ocpu.rpc("searchQuandle", {
-          query : "SP500"
-        }, function(output){
-          //alert("Should be working quandle it is");
-          $("#SP500").text(output);
-          
-        });
-        
-        /*
-        var publishQuandlResults = ocpu.rpc("getQuandlInfo", {
-          query : $("#SP500").val()
-        }, function(data){
-          alert("Should be printing results it is");
-          $("#results").text(data);
-        });
-        */
         
         //publish plot
         var plo = $("#plotable").rplot("getSP500", {
@@ -43,15 +18,6 @@ $(document).ready(function(){
           alert("Failed to plot stock: " + plo.responseText)
         });
     
-        //if R returns an error, alert the error message
-        //req.fail(function(){
-        //  alert("Server error: " + req.responseText);
-        //});
-        //
-        //after request complete, re-enable the button 
-        //req.always(function(){
-        //  $("#submitbutton").removeAttr("disabled")
-        //});
         $("#submitbutton").removeAttr("disabled");
       });
 
@@ -101,7 +67,7 @@ function addInputMethod() {
         $("#registerbutton").attr("disabled", "disabled");
         var reguser = $("#regUser").val();
         var regpass = $("#regPass").val();
-        //alert("registerbutton pressed " + reguser + " " + regpass);
+        alert("registerbutton pressed " + reguser + " " + regpass);
         
         var validateRegister = ocpu.rpc("addNewLogin", {
           user : reguser,

@@ -25,7 +25,10 @@ addNewLogin = function(user, password){
     return("unsuccessful")
   }else {
     con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
-    res = dbSendQuery(con, paste0("insert into logins values ('",user,"','",password,"') "))
+    res = dbSendQuery(con, paste0("insert into logins values (1,'",user,"','",password,"') "))    
+    currentLogin = as.data.frame(user)
+    names(currentLogin) = c("username")
+    dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
     dbDisconnect(con)
     return("successful")
   }
@@ -41,6 +44,11 @@ validateLoginDetails = function(user,pass){
     if(nrow(validateLoginDets)==0){
       return("false") #throw error, wrong password
     } else {
+      con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+      currentLogin = as.data.frame(user)
+      names(currentLogin) = c("username")
+      dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
+      dbDisconnect(con)
       return("true")
     }
   }
@@ -49,7 +57,7 @@ validateLoginDetails = function(user,pass){
 createNewUserDB = function(){
   con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
   newLogin = as.data.frame(cbind("admin","pass"))
-  names(newLogin) = c("username","password"  )
+  names(newLogin) = c("username","password"  )  
   dbWriteTable(con, "logins", newLogin, overwrite = T)
   dbDisconnect(con)
 }

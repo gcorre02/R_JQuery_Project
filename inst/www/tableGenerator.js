@@ -41,6 +41,13 @@ function generateTable(inTicker,inPercentage, correspondingValue){
   // create submit button for the portfolio
   
   createElement("BUTTON","disabled","disabled","portfolio","submitWeights","Submit Portfolio"); 
+  
+  // create submit button for the name of the portfolio
+  createElement("INPUT","disabled","disabled","portfolio","inputpNAME",""); 
+  
+  createElement("BUTTON","disabled","disabled","portfolio","submitpNAME","Submit Portfolio Name"); 
+  
+  
   if(parseFloat(inPercentage) == 100){
     activateButton();
   }
@@ -75,3 +82,4 @@ function addToTable(inTicker,inPercentage,position, correspondingValue){
 function checkUpperCase(someInput){
   return(someInput === someInput.toUpperCase());
 }
+

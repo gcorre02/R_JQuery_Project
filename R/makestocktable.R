@@ -12,16 +12,31 @@
 #' @examples stocktable <- makestocktable(); 
 #' @export
 makestocktable <- function(){
-  mylist <- read.csv("http://finviz.com/export.ashx?v=111&&f=idx_sp500&&o=ticker", stringsAsFactors=FALSE);
-  mylist[c("Ticker", "Company", "Sector", "Industry", "Country")];
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  stocktable = dbReadTable(con, "sp500tickers")
+  dbDisconnect(con)
+  stocktable
 }
 
 getTickers = function(){
-  makestocktable()$Ticker
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  tickers = dbGetQuery(con, "select Ticker from sp500tickers")
+  dbDisconnect(con)
+  as.vector(tickers$Ticker,"character")
 }
 
 getCompanies = function(){
-  makestocktable()$Company
+  #this way is slower:
+  #mylist <- read.csv("http://finviz.com/export.ashx?v=111&&f=idx_sp500&&o=ticker", stringsAsFactors=FALSE);
+  #toSQL = mylist[c("Ticker", "Company", "Sector", "Industry", "Country")];
+  #toSQL$Company
+  #this way is faster:
+  #makestocktable()$Company
+  #this way uses sql
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  companies = dbGetQuery(con, "select Company from sp500tickers")
+  dbDisconnect(con)
+  as.vector(companies$Company,"character")
 }
 
 getOtherValue = function(valueType, namtckr){
@@ -35,6 +50,7 @@ getOtherValue = function(valueType, namtckr){
 #current$Company[which(current$Ticker == "AA")]
 
 getCompanyByTicker = function(namtckr){
+  #not worth converting to sql access since the which function is very practic
   current = makestocktable()
   result = current$Company[which(current$Ticker == namtckr)]
   if(length(result) == 0){
@@ -47,4 +63,12 @@ getTickerByCompany = function(namtckr){
   current = makestocktable()
   result = current$Ticker[which(current$Company == namtckr)]
   result
+}
+
+populateStockTable = function(){
+  mylist <- read.csv("http://finviz.com/export.ashx?v=111&&f=idx_sp500&&o=ticker", stringsAsFactors=FALSE);
+  toSQL = mylist[c("Ticker", "Company", "Sector", "Industry", "Country")];
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  dbWriteTable(con, "sp500tickers", toSQL, overwrite = T)
+  dbDisconnect(con)
 }

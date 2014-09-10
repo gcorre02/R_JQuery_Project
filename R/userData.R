@@ -4,45 +4,48 @@
 # > accessed to add more user portfolios
 
 
-
-createUserData = function(username, password){
-  userData = vector("list",0)
-  userDetail = list(user = username, pass = password, numberOfPortfolios = 0)
-  userData[[1]] = userDetail
-  userData
-}
-
-index = 1
-index = index + 1
-
-#
-
-addPortfolio =function(userData, portfolio){
-#  -> recognize length
-#  -> start adding portfolios on position 2
-  newPortfolioPosition = length(userData) + 1
-  userData[[newPortfolioPosition]] = portfolio
-  userData[[1]]$numberOfPortfolios = userData[[1]]$numberOfPortfolios + 1
-  userData
-}
-
-#-> createPortfolio function
-createPortfolio = function(portfolioDataFrame, portfolioName, typeOfPortfolio){
-  dateCreated = Sys.time()
-  portfolio = list(content = portfolioDataFrame, name = portfolioName, type = typeOfPortfolio, datecreated = dateCreated)
-  portfolio
-}
-
 #-> collect data from website and generate portfolio dataframe
-receivePortfolio = function(id, ticker, company, percentage){
-  assets = data.frame(cbind(id, ticker, company, percentage), stringsAsFactors = FALSE)
-  save(assets, file = "~/test3/data/assetsTest.Rda",compress = F) #belongs to addPortfolio.... methinks
-  #createPortfolio()
-  #addPorfolio
-  #createUserData must be asscoiated with the creation of a new user, and then the html must maintain the user login info to pass as argument in here!
-  return("sucessful")
-
+receivePortfolio = function(id, ticker, company, percentage, prtfName){
+  currentPrtf = as.data.frame(prtfName)
+  names(currentPrtf) = c("prtfNAME")  
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  currentUser = dbReadTable(con, "currentLogin")
+  dbWriteTable(con, "currentPortfolio", currentPrtf, overwrite = T)
+  dbDisconnect(con)
+  if(checkPortfolioAlreadyExists(currentUser,prtfName)){
+    return('Portfolio Already Exists, new input not saved')
+  } else {
+    assets = data.frame(cbind(id, user = currentUser$username, ticker, company, percentage, prtfName), stringsAsFactors = FALSE)
+    addToTable(assets, "portfolio")
+    return("successful")
+  }
 }
+
+checkPortfolioAlreadyExists = function(currentUser,prtfName){
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  exists = dbGetQuery(con,paste0("select * from portfolio where username = '", currentUser, "' and prtfNAME = '",prtfName,"';"))
+  dbDisconnect(con)
+  if(nrow(exists)!=0){
+    return(T)
+  } else {
+    
+    return(F)
+  }
+}
+
+addToTable = function(assets, portfolio){
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  
+  for (i in 1:nrow(assets)){
+    res = dbSendQuery(con,paste("insert into portfolio values ('",   paste(assets[i,],collapse = "','") ,"');"))
+  }  
+  
+  
+  dbDisconnect(con)
+  
+}
+
+#-> add a get portfolio method and a user interface
 
 #-> add methods to edit portfolios
 #-> add visualizations of all available portfolio
@@ -51,26 +54,30 @@ receivePortfolio = function(id, ticker, company, percentage){
 #-> calculate portfolio's details :
 #-> collectionWeights = as.numeric(levels(assets$percentage))/100
 
+getPortfolio = function(){
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  currentUser = dbReadTable(con, "currentLogin")
+  currentPortfolio = dbReadTable(con, "currentPortfolio")
+  reqPortfolio = dbGetQuery(con,paste0("select * from portfolio where username = '", currentUser$username[1], "' and prtfNAME = '",currentPortfolio$prtfNAME[1]," ';")); # !! <ATTENTION> added a space here that might be unnecessary
+  dbDisconnect(con)
+  returnable = reqPortfolio[,c(1,3:5)]
+  names(returnable) = c("id",names(returnable[-1]))
+  returnable
+}
 
 getEff = function(){
- # library(googleVis)#needs to be imported somewhere else, namespace ?
-  
-#  m = gvisMotionChart(Fruits,'Fruit','Year')
-#  collage = c(m$html$header, m$html$chart,m$html$caption,m$html$footer)
-  #collage = m$html$chart
-#  cat(collage, file="/Library/Frameworks/R.framework/Versions/3.1/Resources/library/test3/www/tmp.html")
-#  collage
- # cat(m$html$chart)
-  #  load("~/test3/data/assetsTest.Rda")
-  #  ticker = as.character(assets$ticker)
-  #
-  #prtf = collectData(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-30") #user inputs
-  #contentsX = prtf$minstd
-  #contentsY = prtf$mu
-  #ggplot(data = contents, ymin=lowpoint, aes(Date, ymin=lowpoint, ymax=Close)) + geom_ribbon(color="black", fill="lightblue", alpha=0.5) + ylim(range(contents$Close));  
-  #  qplot(prtf$minstd, prtf$mu, type = "l")+  geom_ribbon(color="black", fill="lightblue", alpha=0.5) + aes(ymin = -0.5, ymax = 1)
-  
-  load(file = "~/test3/data/assetsTest.Rda")
+  assets = getPortfolio()  
   ticker = assets$ticker
   getEffPlot(ticker)
+}
+
+setCurrentPortfolioAndUser = function(currentUser, currentPrtf){
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  currentLogin = as.data.frame(currentUser)
+  names(currentLogin) = c("username")
+  dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
+  currentPrtf = as.data.frame(currentPrtf)
+  names(currentPrtf) = c("prtfNAME")
+  dbWriteTable(con, "currentPortfolio", currentPrtf, overwrite = T)
+  dbDisconnect(con)
 }

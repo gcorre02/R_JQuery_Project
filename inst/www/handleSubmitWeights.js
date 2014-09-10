@@ -1,8 +1,39 @@
 //this js file handles what happens when the submitWeights button is pressed.
 //todo: add toUpperCase in the search box recognition thingy, when filling the prtfolio data
 function activateButton(){
-  $("#submitWeights").removeAttr("disabled");
-  $("#submitWeights").on("click", function(){doAbunchOfStuffWithR()});
+  alert("activate button called");
+  $("#inputpNAME").removeAttr("disabled");
+  $("#submitpNAME").removeAttr("disabled");
+  
+  $("#submitpNAME").on("click", function(){
+   
+    submitzeWeights();
+  });  
+}
+
+function submitzeWeights(){
+  portfolioName = $("#inputpNAME").val();
+  username = $("#user").val();
+  alert("clicked! Portfolio: " +portfolioName + " user : " + username);
+
+
+  var checkpNotExists = ocpu.rpc("checkPortfolioAlreadyExists",{
+    currentUser : username,
+    prtfName : portfolioName
+  },function(output){
+    alert(String(output));
+      if(String(output) == "true"){
+        alert("portfolio already exists!");
+      
+      } else{
+        $("#submitWeights").removeAttr("disabled");
+        $("#submitWeights").on("click", function(){
+          doAbunchOfStuffWithR();
+        });
+      }
+  }).fail(function(){
+          alert("Failed to check if portfolio already exists: " + checkpNotExists.responseText)
+  });
 }
 
 function doAbunchOfStuffWithR(){
@@ -47,32 +78,21 @@ function doAbunchOfStuffWithR(){
   
   });
   
+  portfolioName = $("#inputpNAME").val();
+  alert("portfolio new name is : " + portfolioName);
   var sendPortfData = ocpu.rpc("receivePortfolio", {
           id : id,
           ticker : ticker,
           company : opposite,
-          percentage : percentage
+          percentage : percentage,
+          prtfName : portfolioName
         }, function(output){
           alert("R persistence of Portfolio: " + output);
+        }).fail(function(){
+          alert("failed to persist portfolio details: " + sendPortfData.responseText)
         });
         
-  //publish eff frontier plot to div<effPlot>
-        /*
-        var recquestEffofPortfolio = ocpu.rpc("getEff", {
-          
-        },function(output){
-          alert(String(eval(output)));
-          //alert($.("#prtfGraph").html());
-            $("#prtfGraph").removeAttr("hidden");
-         //$("#prtfGraph").attr("srcdoc",String(output));
-         // $("#prtfGraph").html("<iframe srcdoc =\""+ String(eval(output)) + "\"></iframe>");
-     //works:
-          $("#prtfGraph").attr("src","tmp.html");
-
-          //$("#prtfGraph").html("<iframe src = \"tmp.html\"></iframe>");
-        }).fail(function(){
-          alert("Failed to plot stock: " + recquestEffofPortfolio.responseText)
-        });*/
+ 
   
         var plon = $("#plotable").rplot("getEff", {
           

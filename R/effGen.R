@@ -5,7 +5,7 @@
 #ticker = c("CMG","LNKD","AMZN","GOOGL","WFC","SBUX")
 
 #this has to be called right before the server is (plus lines 93 and 94 )
-sp500Tickers = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
+#sp500Tickers = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
 
 # analyse 500 -> depends on computing power ???
 
@@ -93,19 +93,35 @@ stepThroughEffPortfolios = function(start, end, step, A,B,C,D, w_g, w_d, zbar, S
 ##function
 collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-30", targetScale, local = T){#dates here matter, but only when getReturnsFromDatabase can handle it.
   #zoom = 100
-  sourceData = 1
-  sampleSize = 8
+  #review target return value -> magic number ish
   targetReturn = 2
-#  sampleSize = 18
-#  ticker = sample(sp500Tickers, sampleSize)
-  
-  if(local){
-    acquiredStocks = getReturnsFromDatabase(ticker)
-  } else { 
-    acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = end, start = start)
-  }
 
-  allStockHistory = NULL
+  
+ # if(local){
+#    acquiredStocks = getReturnsFromDatabase(ticker)
+#  } else { 
+#    acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = end, start = start)
+#  }
+#
+#
+#  allStockHistory = NULL
+#  for(i in 1:length(acquiredStocks$ticker)){
+#    if(is.null(allStockHistory)){
+#      allStockHistory = as.matrix(acquiredStocks$full[[i]]$Close)
+#      colnames(allStockHistory) = acquiredStocks$ticker[i]
+#    }else{
+#      previousNames = colnames(allStockHistory)
+#      allStockHistory = cbind(allStockHistory, acquiredStocks$full[[i]]$Close)  
+#      colnames(allStockHistory) = c(previousNames, acquiredStocks$ticker[i])
+#    }  }
+#  repeating code:
+if(local){
+  acquiredStocks = getReturnsFromDatabase(ticker)
+  allStockHistory = acquiredStocks$full
+  
+} else { 
+  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-07-30") 
+  
   for(i in 1:length(acquiredStocks$ticker)){
     if(is.null(allStockHistory)){
       allStockHistory = as.matrix(acquiredStocks$full[[i]]$Close)
@@ -117,6 +133,9 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
     }  
   }
   
+}
+
+
   #important variables
   averageReturn = colMeans(acquiredStocks$R)*100#((1 + colMeans(acquiredStocks$R))^(365)-1)*100 ##-> missing probability here!
   stocksVariance = cov(allStockHistory)#this should probably be cov not var
@@ -262,7 +281,7 @@ collectData = function(ticker, zoom = 200, end = "2014-08-31", start = "2014-06-
   
   returnableData
 }
-
+#<HERE>
 getEffPlot = function(ticker, local = T){
   
  #ticker = c("RHI",  "GT",   "SPG",  "CTXS", "PH",   "AMGN", "MSFT", "OMC" )
@@ -305,18 +324,22 @@ getSP500 = function(sample){
   receivePortfolio(id = (1:sample) ,ticker = sp500Tickers ,company = getCompaniesFromTickers(sp500Tickers) ,percentage = rep(1/sample*100, sample))#handle adding company names matrix
   getEffPlot(sp500Tickers, T)
 }
+
 getCompaniesFromTickers = function(tickers){
+  #getCompanyByTicker use sql and make this function use sql directly
   pos = 0
   for(ticker in tickers){
     if(pos == 0){
       companies = getCompanyByTicker(ticker)
     } else {
-      companies = c(companies, getCompanyByTicker(ticker))
+      companies = c(companies, getCompanyByTicker(ticker)) 
     }
     pos = pos + 1
   }
   companies
 }
+
+
 solveWCompSingular = function(somematrix){
   returnable = tryCatch({
     solve(somematrix)
@@ -325,6 +348,9 @@ solveWCompSingular = function(somematrix){
   }, error = function(e) {
     ginv(somematrix)
   })
+  colnames(returnable) = rownames(somematrix)
+  rownames(returnable) = colnames(somematrix)
+  returnable
 }
 
 #data = collectData(ticker, zoom = 100, end = "2014-08-31", start = "2014-07-30")
@@ -337,46 +363,5 @@ solveWCompSingular = function(somematrix){
 #bub = gvisMotionChart(allData)
 #plot(bub)
 
-getReturnsFromDatabase = function(ticker){
-  
-  tryCatch({
-    load(file = "~/test3/data/acquiredStocks.Rda")
-  }, error = function(e) {
-    persistSP500DB()
-    load(file = "~/test3/data/acquiredStocks.Rda")
-  })
-  R = acquiredStocks$R[,ticker]
-  ticker = ticker
-  period = acquiredStocks$period
-  start = acquiredStocks$start
-  end = acquiredStocks$end
-  full = acquiredStocks$full[ticker]
-  returnable = list(R = R, ticker = ticker, period = period, start = start, end = end, full = full)
-  class(returnable) = "stockReturns"
-  return(returnable)
-}
 
-persistSP500DB = function(){#need to handle time frames around here!
-  ticker = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
-  acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30") 
-  #save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
-  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
-  acq = convertAcqtoDF(acquiredStocks)
-  rwrite = dbWriteTable(con, "fullSP500returns", acq$R, overwrite = T)
-  cwrite = dbWriteTable(con, "fullSP500close", acq$Close, overwrite = T)
-  dbDisconnect(con)
-  return(rwrite&cwrite)
-}
-#had to convert this large object into something SQLite can understand
-convertAcqtoDF = function(acquiredStocks){
-  returnable = vector("list",0)
-  returnable$R = as.data.frame(acquiredStocks$R, stringsAsFactors = FALSE)
-  fullClose = data.frame(row.names = acquiredStocks$full$A$Date,stringsAsFactors = FALSE)
-  for(item in acquiredStocks$full){
-    fullClose = cbind(fullClose, item$Close)
-  }
-#  fullClose = cbind(acquiredStocks$full$A$Date,fullClose)
-  colnames(fullClose) = acquiredStocks$ticker
-  returnable$Close = fullClose
-  return(returnable)
-}
+

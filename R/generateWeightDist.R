@@ -1,3 +1,5 @@
+# this function generates a random distribution of wheights according to the number of assets provided
+# it makes sure it sums up to 1
 getSampleDistributionOfWeights = function(numofass){
 
   numOfAssets = numofass

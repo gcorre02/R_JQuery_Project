@@ -3,18 +3,32 @@
 source("~/test3/R/generateWeightDist.R")
 
 getWeighted = function(){
-  library(stats)
-  library(tseries)
-  library(stockPortfolio)
 
 local = T # make this an input
-load(file = "~/test3/data/assetsTest.Rda")
+assets = getPortfolio()
 ticker = assets$ticker
 #ticker = sample(sp500Tickers, sampleSize)
+allStockHistory = NULL
+
+
 if(local){
   acquiredStocks = getReturnsFromDatabase(ticker)
-} else { 
+  allStockHistory = acquiredStocks$full
+  
+  } else { 
   acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-07-30") 
+  
+  for(i in 1:length(acquiredStocks$ticker)){
+    if(is.null(allStockHistory)){
+      allStockHistory = as.matrix(acquiredStocks$full[[i]]$Close)
+      colnames(allStockHistory) = acquiredStocks$ticker[i]
+    }else{
+      previousNames = colnames(allStockHistory)
+      allStockHistory = cbind(allStockHistory, acquiredStocks$full[[i]]$Close)  
+      colnames(allStockHistory) = c(previousNames, acquiredStocks$ticker[i])
+    }  
+  }
+  
 }
  
 
@@ -23,17 +37,6 @@ collectionWeights = as.numeric(as.character(assets$percentage))/100
 #collectionWeights = getSampleDistributionOfWeights(30)
 #collectionWeights = c(0.4,0.6)
 
-allStockHistory = NULL
-for(i in 1:length(acquiredStocks$ticker)){
-  if(is.null(allStockHistory)){
-    allStockHistory = as.matrix(acquiredStocks$full[[i]]$Close)
-    colnames(allStockHistory) = acquiredStocks$ticker[i]
-  }else{
-    previousNames = colnames(allStockHistory)
-    allStockHistory = cbind(allStockHistory, acquiredStocks$full[[i]]$Close)  
-    colnames(allStockHistory) = c(previousNames, acquiredStocks$ticker[i])
-  }  
-}
 
 #important variables
 averageReturn = colMeans(acquiredStocks$R)  #using average return for the expected ?
