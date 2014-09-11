@@ -316,6 +316,11 @@ getTablesOfEffPlot = function(targetreturn){
   #varH = HTML(as.data.frame(outtableHtml), file = "testTable.html")
 }
 
+getVectorOfProducedExpectedReturs = function(){
+  load(file = "~/test3/data/prtfdata.Rda")
+  effData$pc$pointsDF$mu
+}
+
 #than transform this into a sampling funciton of the sp500, with n of assets as args
 getSP500 = function(sample){
   sample = as.numeric(as.character(sample))

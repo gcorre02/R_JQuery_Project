@@ -11,6 +11,11 @@
 #removeExtra = dbSendQuery(con, "delete from logins where username = 'awesome'")
 #dbDisconnect(con)
 
+
+#current user and login must be stored in the html, not the sql!!! otherwise no concurrency!!!
+#the same needs to happen with the eff file that is being generated!!! it needs to be added to sql with a user name and portfolio name id like the portfolio table
+
+
 checkLoginExists = function(user){
   con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
   validateLogin = dbGetQuery(con, paste0("select * from logins where username = '",user,"'"))

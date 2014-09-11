@@ -122,19 +122,41 @@ function doAbunchOfStuffWithR(){
 }
 
 function generateTableButtons(){
-  $("#tableButtons").html("<p>Choose Target Portfolio by Return, but currently just count the points from the lowest y , beginning in 2...</p>");
-  createElement("input", "type", "text", "tableButtons", "chooseReturn","");
+  $("#tableButtons").html("<p>Choose Target Portfolio by Return and see its new distribution</p>");
+
   createElement("BUTTON", "", "", "tableButtons", "firstprtftable","produce weights table");
   
+  createElement("SELECT", "", "", "tableButtons", "selectReturn","<option value=2>Please select a target Return</option>");
+  
+  populateselectReturns();
+
   $("#firstprtftable").on("click",function(){
-    alert("you chose number : "+ $("#chooseReturn").val());
-    populateWTables($("#chooseReturn").val());
-    
+    alert("you chose number : "+ $("#selectReturn").val());
+    populateWTables($("#selectReturn").val());
+  
   });
 }
 
 //tis requesting the index of the array, not the actual return!
 //also, later user can input the range of values he wants to produce optimized portfolios for and the step around it, this input box[chooseReturn] will show this data straight out.
+
+
+function populateselectReturns(){
+  var selectReturnsPop = ocpu.rpc("getVectorOfProducedExpectedReturs",{
+  
+  },function(output){
+      alert(String(eval(output)));
+      pos = 2
+      String(output).split(",").forEach(function(entry){
+        alert(String(entry));
+     //   instead of entry you can put an int that has to do with its position in the list
+        createElement("OPTION", "value", pos, "selectReturn", "",entry);
+        pos++;
+  
+      });
+  });
+}
+
 function populateWTables(targetreturn){ 
   var populateWeightTables = ocpu.rpc("getTablesOfEffPlot",{
   targetreturn : targetreturn

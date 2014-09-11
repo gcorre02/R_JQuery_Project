@@ -9,6 +9,14 @@ persistSP500DB = function(){#need to handle time frames around here!
   dbDisconnect(con)
   return(rwrite&cwrite)
 }
+
+removeAllSp500RandomsFromSQL(){
+  #use this to trim the sql file
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  res = dbGetQuery(con, ' delete from portfolio where username = \'sp500General\'')
+  dbDisconnect(con)  
+}
+
 #had to convert this large object into something SQLite can understand
 convertAcqtoDF = function(acquiredStocks){
   returnable = vector("list",0)
