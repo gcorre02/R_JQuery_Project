@@ -1,5 +1,5 @@
 persistSP500DB = function(){#need to handle time frames around here!
-  ticker = as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
+  ticker = getTickers()#as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
   acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30") 
   #save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
   con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")

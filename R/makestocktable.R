@@ -65,9 +65,12 @@ getTickerByCompany = function(namtckr){
   result
 }
 
+#removed problematic rows because of incompatible characters with query, to be resolved
+#also removing PCLN because it is a massive outlier.
 populateStockTable = function(){
   mylist <- read.csv("http://finviz.com/export.ashx?v=111&&f=idx_sp500&&o=ticker", stringsAsFactors=FALSE);
   toSQL = mylist[c("Ticker", "Company", "Sector", "Industry", "Country")];
+  toSQL = toSQL[c(-27,-61,-70,-267,-281,-286,-292,-295,-349,-352),]
   con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
   dbWriteTable(con, "sp500tickers", toSQL, overwrite = T)
   dbDisconnect(con)

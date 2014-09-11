@@ -23,7 +23,7 @@ function generateStocksList(listType, formId,target) {//got this: from somewhere
       button.appendChild(btnText);
       document.getElementById(formId).appendChild(button);
       
-      appendOptions("awesome", target);
+      //appendOptions("awesome", target);
       //the list type directly calls the right R method
       ocpu.rpc(listType,{
       //args?
