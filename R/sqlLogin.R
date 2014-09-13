@@ -60,7 +60,7 @@ validateLoginDetails = function(user,pass){
 }
 
 createNewUserDB = function(){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "~\test3\data\portfolioManager")
   newLogin = as.data.frame(cbind(c("admin","sp500General"),c("pass","sp500")))
   names(newLogin) = c("username","password"  )  
   dbWriteTable(con, "logins", newLogin, overwrite = T)
