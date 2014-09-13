@@ -1,6 +1,6 @@
 #this script is responsible for identifying the risk and expected return of the inputed portfolio distribution
 
-source("~/test3/R/generateWeightDist.R")
+#source("~/test3/R/generateWeightDist.R")
 
 getWeighted = function(){
 
