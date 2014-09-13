@@ -3,14 +3,13 @@ persistSP500DB = function(){#need to handle time frames around here!
   acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30")# 
   #save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
   con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
-  acq = convertAcqtoDF(acquiredStocks)
   rwrite = dbWriteTable(con, "fullSP500returns", acq$R, overwrite = T)
   cwrite = dbWriteTable(con, "fullSP500close", acq$Close, overwrite = T)
   dbDisconnect(con)
   return(rwrite&cwrite)
 }
 
-removeAllSp500RandomsFromSQL(){
+removeAllSp500RandomsFromSQL = function(){
   #use this to trim the sql file
   con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
   res = dbGetQuery(con, ' delete from portfolio where username = \'sp500General\'')
