@@ -17,7 +17,7 @@
 
 
 checkLoginExists = function(user){
-  con <- dbConnect(dbDriver("SQLite"), dbname =  "/var/www/portfolioManager")#  "~/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/var/www/portfolioManager")#  "~/test3/data/portfolioManager")
   validateLogin = dbGetQuery(con, paste0("select * from logins where username = '",user,"'"))
   dbDisconnect(con)
   if(nrow(validateLogin)==0){
