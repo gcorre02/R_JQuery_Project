@@ -17,7 +17,7 @@
 
 
 checkLoginExists = function(user){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager", shared.cache = T)#  "~/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "http://localhost/data/portfolioManager")#  "~/test3/data/portfolioManager")
   validateLogin = dbGetQuery(con, paste0("select * from logins where username = '",user,"'"))
   dbDisconnect(con)
   if(nrow(validateLogin)==0){
@@ -43,13 +43,13 @@ validateLoginDetails = function(user,pass){
   if(!checkLoginExists(user)){
     return("Unregistered")
   } else{
-    con <- dbConnect(dbDriver("SQLite"), dbname =  "/usr/local/lib/R/site-library/test3/data/portfolioManager", shared.cache = T)# "~/test3/data/portfolioManager")
+    con <- dbConnect(dbDriver("SQLite"), dbname =  "http://localhost/data/portfolioManager")# "~/test3/data/portfolioManager")
     validateLoginDets = dbGetQuery(con, paste0("select * from logins where username = '",user,"' AND password = '",pass,"';"))
     dbDisconnect(con)
     if(nrow(validateLoginDets)==0){
       return("false") #throw error, wrong password
     } else {
-      con <- dbConnect(dbDriver("SQLite"), dbname =  "/usr/local/lib/R/site-library/test3/data/portfolioManager", shared.cache = T)#"~/test3/data/portfolioManager")
+      con <- dbConnect(dbDriver("SQLite"), dbname =  "http://localhost//data/portfolioManager")#"~/test3/data/portfolioManager")
       currentLogin = as.data.frame(user)
       names(currentLogin) = c("username")
       dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
