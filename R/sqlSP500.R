@@ -2,7 +2,7 @@ persistSP500DB = function(){#need to handle time frames around here!
   ticker = getTickers()#as.matrix((read.csv("~/sp500list.csv"))$Sym[-354])[,1]
   acquiredStocks = getReturns(ticker, freq = "day", get = c("overlapOnly"), end = "2014-08-31", start = "2014-06-30")# 
   #save(acquiredStocks, file = "~/test3/data/acquiredStocks.Rda", compress = F)
-  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
   rwrite = dbWriteTable(con, "fullSP500returns", acq$R, overwrite = T)
   cwrite = dbWriteTable(con, "fullSP500close", acq$Close, overwrite = T)
   dbDisconnect(con)
@@ -11,7 +11,7 @@ persistSP500DB = function(){#need to handle time frames around here!
 
 removeAllSp500RandomsFromSQL = function(){
   #use this to trim the sql file
-  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
   res = dbGetQuery(con, ' delete from portfolio where username = \'sp500General\'')
   dbDisconnect(con)  
 }
@@ -34,7 +34,7 @@ convertAcqtoDF = function(acquiredStocks){
 
 getReturnsFromDatabase = function(ticker){
   
-  con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
   rcheck = dbExistsTable(con,"fullSP500returns")
   ccheck = dbExistsTable(con,"fullSP500close")
   #later -> dbDisconnect(con)
@@ -42,7 +42,7 @@ getReturnsFromDatabase = function(ticker){
   if(!rcheck&ccheck){
     dbDisconnect(con)
     persistSP500DB() 
-    con <- dbConnect(dbDriver("SQLite"), dbname = "~/test3/data/portfolioManager")
+    con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
   } 
   
   acquiredStocks = list()
