@@ -17,7 +17,7 @@
 
 
 checkLoginExists = function(user){
-  con <- dbConnect(dbDriver("SQLite"),dbname = "/var/www/html/data/portfolioManager")#  "/var/www/html/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"),dbname = "/data/portfolioManager")#  "~/test3/data/portfolioManager")
   validateLogin = dbGetQuery(con, paste0("select * from logins where username = '",user,"'"))
   dbDisconnect(con)
   if(nrow(validateLogin)==0){
@@ -29,7 +29,7 @@ addNewLogin = function(user, password){
   if(checkLoginExists(user)){
     return("unsuccessful")
   }else {
-    con <- dbConnect(dbDriver("SQLite"), dbname = "/var/www/html/data/portfolioManager")
+    con <- dbConnect(dbDriver("SQLite"), dbname = "/data/portfolioManager")
     res = dbSendQuery(con, paste0("insert into logins values (1,'",user,"','",password,"') "))    
     currentLogin = as.data.frame(user)
     names(currentLogin) = c("username")
@@ -43,13 +43,13 @@ validateLoginDetails = function(user,pass){
   if(!checkLoginExists(user)){
     return("Unregistered")
   } else{
-    con <- dbConnect(dbDriver("SQLite"),dbname = "/var/www/html/data/portfolioManager")# "/var/www/html/data/portfolioManager")
+    con <- dbConnect(dbDriver("SQLite"),dbname = "/data/portfolioManager")# "~/test3/data/portfolioManager")
     validateLoginDets = dbGetQuery(con, paste0("select * from logins where username = '",user,"' AND password = '",pass,"';"))
     dbDisconnect(con)
     if(nrow(validateLoginDets)==0){
       return("false") #throw error, wrong password
     } else {
-      con <- dbConnect(dbDriver("SQLite"), dbname = "/var/www/html/data/portfolioManager")#"/var/www/html/data/portfolioManager")
+      con <- dbConnect(dbDriver("SQLite"), dbname = "/data/portfolioManager")#"~/test3/data/portfolioManager")
       currentLogin = as.data.frame(user)
       names(currentLogin) = c("username")
       dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
@@ -60,7 +60,7 @@ validateLoginDetails = function(user,pass){
 }
 
 createNewUserDB = function(){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/var/www/html/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/data/portfolioManager")
   newLogin = as.data.frame(cbind(c("admin","sp500General"),c("pass","sp500")))
   names(newLogin) = c("username","password"  )  
   dbWriteTable(con, "logins", newLogin, overwrite = T)
