@@ -289,7 +289,7 @@ getEffPlot = function(ticker, local = T){
   targetScale = userPrtf$expectedPrtfReturn
   effData = collectData(ticker, zoom = 500, end = "2014-08-31", start = "2014-07-30", targetScale,local)# using local makes it lose the names of the tickers...
   #then js is ready to call the tables as necessary!!
-  save(effData, file = "~/test3/data/prtfdata.Rda", compress = F)
+  save(effData, file = "/usr/local/lib/R/site-library/test3/data/prtfdata.Rda", compress = F)
   #dfDemo <- structure(list(Y = c(0.906231077471568, 0.569073561538186,0.0783433165521566, 0.724580209473378, 0.359136092118470, 0.871301974471722,0.400628333618918, 1.41778205350433, 0.932081770977729, 0.198188442350644), X = c(0.208755495088456, 0.147750173706688, 0.0205864576474412,0.162635017485883, 0.118877260137735, 0.186538613831806, 0.137831912094464,0.293293029083812, 0.219247919537514, 0.0323148791663826), Z = c(11114987L,11112951L,11713300L, 14331476L, 11539301L, 12233602L, 15764099L, 10191778L,12070774L, 11836422L, 15148685L)), .Names = c("Y", "X", "Z"), row.names = c(NA, 10L), class = "data.frame")
   returns = qplot(x = effData$data$minstd, y = effData$data$mu, geom=c("path")) + geom_line(fill = "blue", colour="grey", alpha = 1/3 )#geom = c("line", "smooth")
   returns = returns + geom_point(data=effData$pc$pointsDF, aes(x = minstd, y = mu, colour = minstd), size = 3.5) + scale_colour_gradient(low = "green",high = "red")
@@ -304,7 +304,7 @@ getEffPlot = function(ticker, local = T){
 }
 
 getTablesOfEffPlot = function(targetreturn){
-  load(file = "~/test3/data/prtfdata.Rda")
+  load(file = "/usr/local/lib/R/site-library/test3/data/prtfdata.Rda")
   targetreturn = as.numeric(targetreturn)
   outtableHtml = as.data.frame(effData$pc[[targetreturn]]$portfolioWeights, stringsAsFactors = FALSE)
   #loop to do this to every point:
@@ -317,7 +317,7 @@ getTablesOfEffPlot = function(targetreturn){
 }
 
 getVectorOfProducedExpectedReturs = function(){
-  load(file = "~/test3/data/prtfdata.Rda")
+  load(file = "/usr/local/lib/R/site-library/test3/data/prtfdata.Rda")
   effData$pc$pointsDF$mu
 }
 
