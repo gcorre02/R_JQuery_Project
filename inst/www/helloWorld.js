@@ -9,7 +9,7 @@ $(document).ready(function(){
         var myname = $("#fname").val() + " " + $("#lname").val();
         //perform the request
         
-        $("#plotable").find('div').css("height","600");
+       
         //publish plot
         var plo = $("#plotable").rplot("getSP500", {
           //target : $("#sp500input").val() 
@@ -17,7 +17,8 @@ $(document).ready(function(){
         }).fail(function(){
           alert("Failed to plot stock: " + plo.responseText)
         });
-    
+        $("#plotable").find('div').css("height","600");
+        
         $("#submitbutton").removeAttr("disabled");
       });
 
