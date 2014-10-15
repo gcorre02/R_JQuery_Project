@@ -36,7 +36,7 @@ $(document).ready(function(){
           alert("Your login is " + output) ;
           if(output == "true"){//note : only == works here...
             $("#login").text("Login Successful");
-            $("#loginform").attr("area-hidden","true");
+            $("#loginform").attr("display","none");
           } else if (output == "false"){
             $("#login").text("Login unsuccessful");
           } else {
