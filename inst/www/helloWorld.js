@@ -1,6 +1,6 @@
 $(document).ready(function(){
-  ////alert("the thing was");
-  //alert("this new version");
+  //alert("the thing was");
+  alert("JS is working");
   
         $("#submitbutton").on("click", function(){
         //disable the button to prevent multiple clicks
@@ -15,7 +15,7 @@ $(document).ready(function(){
           //target : $("#sp500input").val() 
           sample : $("#sp500input").val()
         }).fail(function(){
-          //alert("Failed to plot stock: " + plo.responseText)
+          alert("Failed to plot stock: " + plo.responseText)
         });
         $("#plotable").find('div').css("height","600");
         
@@ -27,7 +27,7 @@ $(document).ready(function(){
         $("#loginbutton").attr("disabled", "disabled");
         var user = $("#user").val();
         var pass = $("#pass").val();
-        ////alert("loginbutton pressed " + user + " " + pass);
+        //alert("loginbutton pressed " + user + " " + pass);
 
         var validateLogin = ocpu.rpc("validateLoginDetails", {
           user : user,
@@ -46,7 +46,7 @@ $(document).ready(function(){
             addInputMethod();
           }
         }).fail(function(){
-          //alert("R failed " + validateLogin.responseText)
+          alert("R failed " + validateLogin.responseText)
         });
         
         $("#loginbutton").removeAttr("disabled");
@@ -76,7 +76,7 @@ function addInputMethod() {
           password : regpass
         }, function(output){
           //should link somewhere
-          //alert("Your registration was " + output) ;/*
+          alert("Your registration was " + output) ;/*
           if(output == "true"){//note : only == works here...
             $("#login").text("Login Successful");
           } else if (output == "false"){
@@ -87,7 +87,7 @@ function addInputMethod() {
             addInputMethod();
           }*/
         }).fail(function(){
-          //alert("R failed " + validateLogin.responseText)
+          alert("R failed " + validateLogin.responseText)
         });
         
         $("#loginbutton").removeAttr("disabled");

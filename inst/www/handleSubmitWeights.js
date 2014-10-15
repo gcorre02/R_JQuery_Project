@@ -23,7 +23,7 @@ function submitzeWeights(){
   },function(output){
     //alert(String(output));
       if(String(output) == "true"){
-        //alert("portfolio already exists!");
+        alert("portfolio already exists!");
       
       } else{
         $("#submitWeights").removeAttr("disabled");
@@ -32,7 +32,7 @@ function submitzeWeights(){
         });
       }
   }).fail(function(){
-          //alert("Failed to check if portfolio already exists: " + checkpNotExists.responseText)
+          alert("Failed to check if portfolio already exists: " + checkpNotExists.responseText)
   });
 }
 
@@ -44,33 +44,33 @@ function doAbunchOfStuffWithR(){
   percentage = new Array(0);
   
   $("#tableBody").find("td").each(function(i, value){
-    ////alert(i+" : "+value.innerHTML);
+    //alert(i+" : "+value.innerHTML);
     
     switch(index){
       case 0 : 
         id.push.apply(id, [parseInt(value.innerHTML)]);
-      //  //alert("id = " + id);
+      //  alert("id = " + id);
         break;
       
       case 1 :
         ticker.push.apply(ticker, [value.innerHTML]);
-    //    //alert("ticker = " + ticker);
+    //    alert("ticker = " + ticker);
         break;
       
       case 2 :
         opposite.push.apply(opposite, [value.innerHTML]);
-  //      //alert("opposite = " + opposite);
+  //      alert("opposite = " + opposite);
         break;
       
       case 3 : 
         percentage.push.apply(percentage, [parseFloat(value.innerHTML)]);
-//        //alert("% = " + percentage);
+//        alert("% = " + percentage);
         index = -1;
         break;
       
       default:
       index = 0;
-      //alert("looping not done propperly");
+      alert("looping not done propperly");
     }
     
     index++;
@@ -87,9 +87,9 @@ function doAbunchOfStuffWithR(){
           percentage : percentage,
           prtfName : portfolioName
         }, function(output){
-          //alert("R persistence of Portfolio: " + output);
+          alert("R persistence of Portfolio: " + output);
         }).fail(function(){
-          //alert("failed to persist portfolio details: " + sendPortfData.responseText)
+          alert("failed to persist portfolio details: " + sendPortfData.responseText)
         });
         
  
@@ -97,16 +97,16 @@ function doAbunchOfStuffWithR(){
         var plon = $("#plotable").rplot("getEff", {
           
         }).fail(function(){
-          //alert("Failed to plot stock: " + plon.responseText)
+          alert("Failed to plot stock: " + plon.responseText)
         });
         $("#plotable").find('div').css("height","600");
         
         var getWeightPoint = ocpu.rpc("getWeighted",{},
         function(output){
-        //  //alert(String(output));
+        //  alert(String(output));
         $("#weightedResults").html("<p>"+String(output)+"</p>");
         }).fail(function(){
-          //alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
+          alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
         });
        
         generateTableButtons();
@@ -182,7 +182,7 @@ function populateWTables(targetreturn){
         });
         
         }).fail(function(){
-          //alert("failed to publish generated efficient portfolio tables: " + populateWeightTables.responseText)
+          alert("failed to publish generated efficient portfolio tables: " + populateWeightTables.responseText)
         });
         
 }
