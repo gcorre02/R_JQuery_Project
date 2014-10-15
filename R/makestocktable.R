@@ -12,14 +12,14 @@
 #' @examples stocktable <- makestocktable(); 
 #' @export
 makestocktable <- function(){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   stocktable = dbReadTable(con, "sp500tickers")
   dbDisconnect(con)
   stocktable
 }
 
 getTickers = function(){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   tickers = dbGetQuery(con, "select Ticker from sp500tickers")
   dbDisconnect(con)
   as.vector(tickers$Ticker,"character")
@@ -33,7 +33,7 @@ getCompanies = function(){
   #this way is faster:
   #makestocktable()$Company
   #this way uses sql
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   companies = dbGetQuery(con, "select Company from sp500tickers")
   dbDisconnect(con)
   as.vector(companies$Company,"character")
@@ -71,7 +71,7 @@ populateStockTable = function(){
   mylist <- read.csv("http://finviz.com/export.ashx?v=111&&f=idx_sp500&&o=ticker", stringsAsFactors=FALSE);
   toSQL = mylist[c("Ticker", "Company", "Sector", "Industry", "Country")];
   toSQL = toSQL[c(-27,-61,-70,-267,-281,-286,-292,-295,-349,-352),]
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   dbWriteTable(con, "sp500tickers", toSQL, overwrite = T)
   dbDisconnect(con)
 }

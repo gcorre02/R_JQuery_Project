@@ -8,7 +8,7 @@
 receivePortfolio = function(id, ticker, company, percentage, prtfName){
   currentPrtf = as.data.frame(prtfName)
   names(currentPrtf) = c("prtfNAME")  
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   currentUser = dbReadTable(con, "currentLogin")
   dbWriteTable(con, "currentPortfolio", currentPrtf, overwrite = T)
   dbDisconnect(con)
@@ -22,7 +22,7 @@ receivePortfolio = function(id, ticker, company, percentage, prtfName){
 }
 
 checkPortfolioAlreadyExists = function(currentUser,prtfName){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   exists = dbGetQuery(con,paste0("select * from portfolio where username = '", currentUser, "' and prtfNAME = '",prtfName,"';"))
   dbDisconnect(con)
   if(nrow(exists)!=0){
@@ -34,7 +34,7 @@ checkPortfolioAlreadyExists = function(currentUser,prtfName){
 }
 
 addToTable = function(assets, portfolio){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   
   for (i in 1:nrow(assets)){
     res = dbSendQuery(con,paste("insert into portfolio values ('",   paste(assets[i,],collapse = "','") ,"');"))
@@ -55,7 +55,7 @@ addToTable = function(assets, portfolio){
 #-> collectionWeights = as.numeric(levels(assets$percentage))/100
 
 getPortfolio = function(){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   currentUser = dbReadTable(con, "currentLogin")
   currentPortfolio = dbReadTable(con, "currentPortfolio")
   reqPortfolio = dbGetQuery(con,paste0("select * from portfolio where username = '", currentUser$username[1], "' and prtfNAME = '",currentPortfolio$prtfNAME[1]," ';")); # !! <ATTENTION> added a space here that might be unnecessary
@@ -72,7 +72,7 @@ getEff = function(){
 }
 
 setCurrentPortfolioAndUser = function(currentUser, currentPrtf){
-  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/portfolioManager")
+  con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
   currentLogin = as.data.frame(currentUser)
   names(currentLogin) = c("username")
   dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
