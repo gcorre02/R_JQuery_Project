@@ -62,7 +62,7 @@ function addToTable(inTicker,inPercentage,position, correspondingValue){
   // need to roundit to 2 or 3 cases!!
   result = current + parseFloat(inPercentage);
   if(result > 100){
-    alert("Your selection is above 100%");
+    //alert("Your selection is above 100%");
   } else {
   
     nameRow = position+"row";

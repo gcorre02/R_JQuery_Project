@@ -29,10 +29,10 @@ function generateStocksList(listType, formId,target) {//got this: from somewhere
       //args?
       },function(output){
         //something = ("ewrdad,aerwefsef,aer,ar,ad");
-        //alert( typeof String(output).split(','));
+        ////alert( typeof String(output).split(','));
         
         allTickers = eval(output);//this function coerces to array the contents of the JSON provided by R (server)
-    //    alert(allTickers);
+    //    //alert(allTickers);
         for(tcker in allTickers){
           appendOptions(allTickers[tcker], target);      
         }
@@ -49,7 +49,7 @@ function generateStocksList(listType, formId,target) {//got this: from somewhere
           valueType : listType,
           namtckr : choice
         }, function(output){
-           //alert("got this from R: " + output);
+           ////alert("got this from R: " + output);
            handleTables(choice, percentage, output);
         });
        
@@ -87,7 +87,7 @@ function handleTables(choice, percentage, correspondingValue){
           addToTable(ticker, percentage,pos, company)  
         }
        // var regpass = $("#regPass").val();
-      //alert("Submit button pressed, choice: " + choice + " for a weight of: "+ percentage + "%");
+      ////alert("Submit button pressed, choice: " + choice + " for a weight of: "+ percentage + "%");
         
 }
 

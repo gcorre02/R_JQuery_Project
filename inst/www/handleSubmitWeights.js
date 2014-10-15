@@ -1,7 +1,7 @@
 //this js file handles what happens when the submitWeights button is pressed.
 //todo: add toUpperCase in the search box recognition thingy, when filling the prtfolio data
 function activateButton(){
-  alert("activate button called");
+  //alert("activate button called");
   $("#inputpNAME").removeAttr("disabled");
   $("#submitpNAME").removeAttr("disabled");
   
@@ -14,16 +14,16 @@ function activateButton(){
 function submitzeWeights(){
   portfolioName = $("#inputpNAME").val();
   username = $("#user").val();
-  alert("clicked! Portfolio: " +portfolioName + " user : " + username);
+  //alert("clicked! Portfolio: " +portfolioName + " user : " + username);
 
 
   var checkpNotExists = ocpu.rpc("checkPortfolioAlreadyExists",{
     currentUser : username,
     prtfName : portfolioName
   },function(output){
-    alert(String(output));
+    //alert(String(output));
       if(String(output) == "true"){
-        alert("portfolio already exists!");
+        //alert("portfolio already exists!");
       
       } else{
         $("#submitWeights").removeAttr("disabled");
@@ -32,7 +32,7 @@ function submitzeWeights(){
         });
       }
   }).fail(function(){
-          alert("Failed to check if portfolio already exists: " + checkpNotExists.responseText)
+          //alert("Failed to check if portfolio already exists: " + checkpNotExists.responseText)
   });
 }
 
@@ -44,33 +44,33 @@ function doAbunchOfStuffWithR(){
   percentage = new Array(0);
   
   $("#tableBody").find("td").each(function(i, value){
-    //alert(i+" : "+value.innerHTML);
+    ////alert(i+" : "+value.innerHTML);
     
     switch(index){
       case 0 : 
         id.push.apply(id, [parseInt(value.innerHTML)]);
-      //  alert("id = " + id);
+      //  //alert("id = " + id);
         break;
       
       case 1 :
         ticker.push.apply(ticker, [value.innerHTML]);
-    //    alert("ticker = " + ticker);
+    //    //alert("ticker = " + ticker);
         break;
       
       case 2 :
         opposite.push.apply(opposite, [value.innerHTML]);
-  //      alert("opposite = " + opposite);
+  //      //alert("opposite = " + opposite);
         break;
       
       case 3 : 
         percentage.push.apply(percentage, [parseFloat(value.innerHTML)]);
-//        alert("% = " + percentage);
+//        //alert("% = " + percentage);
         index = -1;
         break;
       
       default:
       index = 0;
-      alert("looping not done propperly");
+      //alert("looping not done propperly");
     }
     
     index++;
@@ -79,7 +79,7 @@ function doAbunchOfStuffWithR(){
   });
   
   portfolioName = $("#inputpNAME").val();
-  alert("portfolio new name is : " + portfolioName);
+  //alert("portfolio new name is : " + portfolioName);
   var sendPortfData = ocpu.rpc("receivePortfolio", {
           id : id,
           ticker : ticker,
@@ -87,9 +87,9 @@ function doAbunchOfStuffWithR(){
           percentage : percentage,
           prtfName : portfolioName
         }, function(output){
-          alert("R persistence of Portfolio: " + output);
+          //alert("R persistence of Portfolio: " + output);
         }).fail(function(){
-          alert("failed to persist portfolio details: " + sendPortfData.responseText)
+          //alert("failed to persist portfolio details: " + sendPortfData.responseText)
         });
         
  
@@ -97,16 +97,16 @@ function doAbunchOfStuffWithR(){
         var plon = $("#plotable").rplot("getEff", {
           
         }).fail(function(){
-          alert("Failed to plot stock: " + plon.responseText)
+          //alert("Failed to plot stock: " + plon.responseText)
         });
         $("#plotable").find('div').css("height","600");
         
         var getWeightPoint = ocpu.rpc("getWeighted",{},
         function(output){
-        //  alert(String(output));
+        //  //alert(String(output));
         $("#weightedResults").html("<p>"+String(output)+"</p>");
         }).fail(function(){
-          alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
+          //alert("failed to calculate weighted portfolio details: " + getWeightPoint.responseText)
         });
        
         generateTableButtons();
@@ -131,7 +131,7 @@ function generateTableButtons(){
   populateselectReturns();
 
   $("#firstprtftable").on("click",function(){
-    alert("you chose number : "+ $("#selectReturn").val());
+    //alert("you chose number : "+ $("#selectReturn").val());
     populateWTables($("#selectReturn").val());
   
   });
@@ -145,10 +145,10 @@ function populateselectReturns(){
   var selectReturnsPop = ocpu.rpc("getVectorOfProducedExpectedReturs",{
   
   },function(output){
-      alert(String(eval(output)));
+      //alert(String(eval(output)));
       pos = 2
       String(output).split(",").forEach(function(entry){
-        alert(String(entry));
+        //alert(String(entry));
      //   instead of entry you can put an int that has to do with its position in the list
         createElement("OPTION", "value", pos, "selectReturn", "",entry);
         pos++;
@@ -162,7 +162,7 @@ function populateWTables(targetreturn){
   targetreturn : targetreturn
   },
         function(output){
-          alert(String(output));
+          //alert(String(output));
         $("#generatedPrtf").html(String(output));
 //        $("#generatedPrtf").find('th')attr("class","");
         $("#generatedPrtf").find('tr').each(function(i){
@@ -182,7 +182,7 @@ function populateWTables(targetreturn){
         });
         
         }).fail(function(){
-          alert("failed to publish generated efficient portfolio tables: " + populateWeightTables.responseText)
+          //alert("failed to publish generated efficient portfolio tables: " + populateWeightTables.responseText)
         });
         
 }
