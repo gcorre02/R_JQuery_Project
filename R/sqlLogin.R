@@ -30,7 +30,7 @@ addNewLogin = function(user, password){
     return("unsuccessful")
   }else {
     con <- dbConnect(dbDriver("SQLite"), dbname = "/usr/local/lib/R/site-library/test3/data/newDB.sqlite")
-    res = dbSendQuery(con, paste0("insert into logins values (1,'",user,"','",password,"') "))    
+    res = dbGetQuery(con, paste0("insert into logins values (1,'",user,"','",password,"') "))    
     currentLogin = as.data.frame(user)
     names(currentLogin) = c("username")
     dbWriteTable(con, "currentLogin", currentLogin, overwrite = T)
