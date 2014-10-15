@@ -9,7 +9,7 @@ $(document).ready(function(){
         var myname = $("#fname").val() + " " + $("#lname").val();
         //perform the request
         
-        
+        $("#plotable").find('div').css("height","600");
         //publish plot
         var plo = $("#plotable").rplot("getSP500", {
           //target : $("#sp500input").val() 
@@ -36,6 +36,7 @@ $(document).ready(function(){
           alert("Your login is " + output) ;
           if(output == "true"){//note : only == works here...
             $("#login").text("Login Successful");
+            $("#loginform").attr("area-hidden","true");
           } else if (output == "false"){
             $("#login").text("Login unsuccessful");
           } else {
